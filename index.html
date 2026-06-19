@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Helvino Heat Wave Report Development Tool — Monitor, track, and generate reports for Heat Wave Helvino across all affected regions."/>
+  <title>Helvino | Heat Wave Report Development Tool</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <!-- App CSS -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════
+       SIDEBAR
+  ═══════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+          <path d="M12 6v6l4 2"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">HELVINO</span>
+        <span class="brand-sub">Heat Wave Ops</span>
+      </div>
+    </div>
+
+    <div class="severity-badge" id="severityBadge">
+      <span class="severity-dot"></span>
+      <span>EXTREME ALERT</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="map" id="nav-map">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+        <span>Risk Zone Map</span>
+        <span class="nav-badge">7</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="incidents" id="nav-incidents">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Incidents</span>
+        <span class="nav-badge danger" id="incidentCountBadge">0</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="shelters" id="nav-shelters">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Shelters</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="india" id="nav-india">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>India Analysis</span>
+        <span class="nav-badge" style="background:rgba(255,153,51,0.25);color:#FF9933">NEW</span>
+      </a>
+      <a href="#" class="nav-item" data-tab="reports" id="nav-reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span>Report Generator</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="live-clock" id="liveClock">--:--:--</div>
+      <div class="live-date" id="liveDate">--- --, ----</div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════
+       MAIN CONTENT
+  ═══════════════════════════════════════ -->
+  <main class="main-content">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Command Dashboard</div>
+      <div class="topbar-actions">
+        <div class="alert-indicator" id="alertIndicator">
+          <span class="pulse-ring"></span>
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+          <span>3 Active Alerts</span>
+        </div>
+        <button class="btn-icon" id="refreshBtn" title="Refresh data">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner" id="alertBanner">
+      <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+      <strong>EXTREME HEAT WARNING — HELVINO</strong>
+      <span>Temperatures exceeding 48°C recorded in Zones A, B, and D. Mandatory evacuation orders in effect. All emergency services on standby.</span>
+      <button class="banner-close" id="bannerClose" aria-label="Close alert">✕</button>
+    </div>
+
+    <!-- ─────────────────────────────────────
+         TAB: DASHBOARD
+    ───────────────────────────────────── -->
+    <section class="tab-section active" id="tab-dashboard">
+
+      <!-- Stats Row -->
+      <div class="stats-grid">
+        <div class="stat-card heat">
+          <div class="stat-icon">🌡️</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statMaxTemp">48.7°C</div>
+            <div class="stat-label">Peak Temperature</div>
+            <div class="stat-sub trend-up">↑ +3.2° from yesterday</div>
+          </div>
+        </div>
+        <div class="stat-card danger">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statRegions">7</div>
+            <div class="stat-label">Affected Regions</div>
+            <div class="stat-sub trend-up">↑ +2 since 06:00</div>
+          </div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statIncidents">0</div>
+            <div class="stat-label">Active Incidents</div>
+            <div class="stat-sub" id="statIncidentSub">No active incidents</div>
+          </div>
+        </div>
+        <div class="stat-card safe">
+          <div class="stat-icon">🏥</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statShelters">0</div>
+            <div class="stat-label">Shelter Capacity</div>
+            <div class="stat-sub" id="statShelterSub">No shelters registered</div>
+          </div>
+        </div>
+        <div class="stat-card purple">
+          <div class="stat-icon">💀</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statFatalities">12</div>
+            <div class="stat-label">Confirmed Fatalities</div>
+            <div class="stat-sub trend-up">↑ +4 in last 24h</div>
+          </div>
+        </div>
+        <div class="stat-card teal">
+          <div class="stat-icon">🏨</div>
+          <div class="stat-body">
+            <div class="stat-value" id="statHospital">347</div>
+            <div class="stat-label">Hospitalizations</div>
+            <div class="stat-sub trend-up">↑ +89 in last 24h</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="card chart-card wide">
+          <div class="card-header">
+            <h3>Temperature Trend — Last 72 Hours</h3>
+            <div class="chart-legend">
+              <span class="legend-dot orange"></span>Max Temp
+              <span class="legend-dot blue"></span>Avg Temp
+              <span class="legend-dot green"></span>Min Temp
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="tempChart"></canvas>
+          </div>
+        </div>
+        <div class="card chart-card">
+          <div class="card-header">
+            <h3>Humidity & Heat Index</h3>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="humidityChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Row -->
+      <div class="bottom-row">
+        <div class="card">
+          <div class="card-header">
+            <h3>Regional Risk Overview</h3>
+          </div>
+          <div class="risk-table-wrap">
+            <table class="risk-table" id="riskTable">
+              <thead>
+                <tr>
+                  <th>Region</th>
+                  <th>Temp (°C)</th>
+                  <th>Humidity</th>
+                  <th>Population</th>
+                  <th>Risk Level</th>
+                </tr>
+              </thead>
+              <tbody id="riskTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Historical Comparison</h3>
+            <span class="card-badge">vs. Past Events</span>
+          </div>
+          <div class="chart-wrap short">
+            <canvas id="historicalChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ─────────────────────────────────────
+         TAB: RISK ZONE MAP
+    ───────────────────────────────────── -->
+    <section class="tab-section" id="tab-map">
+      <div class="map-controls">
+        <div class="card compact">
+          <h4>Map Layers</h4>
+          <label class="toggle-label"><input type="checkbox" id="layerRisk" checked> Risk Zones</label>
+          <label class="toggle-label"><input type="checkbox" id="layerShelters" checked> Shelters</label>
+          <label class="toggle-label"><input type="checkbox" id="layerIncidents" checked> Incidents</label>
+        </div>
+        <div class="card compact">
+          <h4>Risk Legend</h4>
+          <div class="legend-item"><span class="legend-box extreme"></span>Extreme (>46°C)</div>
+          <div class="legend-item"><span class="legend-box high"></span>High (42–46°C)</div>
+          <div class="legend-item"><span class="legend-box moderate"></span>Moderate (38–42°C)</div>
+          <div class="legend-item"><span class="legend-box low"></span>Low (<38°C)</div>
+        </div>
+        <div class="card compact" id="mapStatsCard">
+          <h4>Zone Statistics</h4>
+          <div class="map-stat"><span>Extreme Zones</span><strong class="danger-text">3</strong></div>
+          <div class="map-stat"><span>High Zones</span><strong class="warn-text">2</strong></div>
+          <div class="map-stat"><span>Moderate Zones</span><strong class="info-text">2</strong></div>
+          <div class="map-stat"><span>Shelter Sites</span><strong class="safe-text" id="mapShelterCount">0</strong></div>
+        </div>
+      </div>
+      <div id="heatMap" class="heat-map"></div>
+    </section>
+
+    <!-- ─────────────────────────────────────
+         TAB: INCIDENTS
+    ───────────────────────────────────── -->
+    <section class="tab-section" id="tab-incidents">
+      <div class="two-col-layout">
+        <!-- Incident Form -->
+        <div class="card form-card">
+          <div class="card-header">
+            <h3>Log New Incident</h3>
+          </div>
+          <form id="incidentForm" class="app-form">
+            <div class="form-group">
+              <label for="incType">Incident Type</label>
+              <select id="incType" required>
+                <option value="">Select type...</option>
+                <option value="Heatstroke">Heatstroke / Medical</option>
+                <option value="Wildfire">Wildfire</option>
+                <option value="Infrastructure">Infrastructure Failure</option>
+                <option value="Power Outage">Power Outage</option>
+                <option value="Water Shortage">Water Shortage</option>
+                <option value="Mass Evacuation">Mass Evacuation</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="incRegion">Region / Location</label>
+              <select id="incRegion" required>
+                <option value="">Select region...</option>
+                <option value="Zone A – Ardena">Zone A – Ardena</option>
+                <option value="Zone B – Braxton">Zone B – Braxton</option>
+                <option value="Zone C – Cordell">Zone C – Cordell</option>
+                <option value="Zone D – Delvar">Zone D – Delvar</option>
+                <option value="Zone E – Elvira">Zone E – Elvira</option>
+                <option value="Zone F – Farentino">Zone F – Farentino</option>
+                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="incSeverity">Severity</label>
+                <select id="incSeverity" required>
+                  <option value="">Select...</option>
+                  <option value="Critical">🔴 Critical</option>
+                  <option value="High">🟠 High</option>
+                  <option value="Moderate">🟡 Moderate</option>
+                  <option value="Low">🟢 Low</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="incCasualties">Casualties</label>
+                <input type="number" id="incCasualties" min="0" value="0" placeholder="0"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="incReporter">Reported By</label>
+              <input type="text" id="incReporter" placeholder="Name / Unit" required/>
+            </div>
+            <div class="form-group">
+              <label for="incNotes">Notes / Description</label>
+              <textarea id="incNotes" rows="3" placeholder="Describe the incident..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary full-width" id="incSubmitBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Log Incident
+            </button>
+          </form>
+        </div>
+
+        <!-- Incident List -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Incident Log <span class="count-badge" id="incidentTotal">0</span></h3>
+            <div class="filter-row">
+              <select id="filterSeverity" class="small-select">
+                <option value="all">All Severity</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Moderate">Moderate</option>
+                <option value="Low">Low</option>
+              </select>
+              <select id="filterRegion" class="small-select">
+                <option value="all">All Regions</option>
+                <option value="Zone A – Ardena">Zone A</option>
+                <option value="Zone B – Braxton">Zone B</option>
+                <option value="Zone C – Cordell">Zone C</option>
+                <option value="Zone D – Delvar">Zone D</option>
+                <option value="Zone E – Elvira">Zone E</option>
+                <option value="Zone F – Farentino">Zone F</option>
+                <option value="Zone G – Gorvia">Zone G</option>
+              </select>
+            </div>
+          </div>
+          <div class="incident-list" id="incidentList">
+            <div class="empty-state" id="incidentEmpty">
+              <div class="empty-icon">📋</div>
+              <p>No incidents logged yet.</p>
+              <p class="empty-sub">Use the form to log the first incident.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Incident Modal -->
+      <div class="modal-overlay" id="incidentModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h3 id="modalTitle">Incident Details</h3>
+            <button class="btn-icon" id="modalClose">✕</button>
+          </div>
+          <div class="modal-body" id="modalBody"></div>
+          <div class="modal-footer">
+            <button class="btn btn-success" id="modalResolve">✓ Mark Resolved</button>
+            <button class="btn btn-danger" id="modalDelete">🗑 Delete</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────
+         TAB: SHELTERS
+    ───────────────────────────────────── -->
+    <section class="tab-section" id="tab-shelters">
+      <div class="two-col-layout">
+        <!-- Shelter Form -->
+        <div class="card form-card">
+          <div class="card-header">
+            <h3>Register Shelter</h3>
+          </div>
+          <form id="shelterForm" class="app-form">
+            <div class="form-group">
+              <label for="shelName">Shelter Name</label>
+              <input type="text" id="shelName" placeholder="e.g., Central Community Hall" required/>
+            </div>
+            <div class="form-group">
+              <label for="shelRegion">Region</label>
+              <select id="shelRegion" required>
+                <option value="">Select region...</option>
+                <option value="Zone A – Ardena">Zone A – Ardena</option>
+                <option value="Zone B – Braxton">Zone B – Braxton</option>
+                <option value="Zone C – Cordell">Zone C – Cordell</option>
+                <option value="Zone D – Delvar">Zone D – Delvar</option>
+                <option value="Zone E – Elvira">Zone E – Elvira</option>
+                <option value="Zone F – Farentino">Zone F – Farentino</option>
+                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shelCapacity">Total Capacity</label>
+                <input type="number" id="shelCapacity" min="1" placeholder="500" required/>
+              </div>
+              <div class="form-group">
+                <label for="shelOccupancy">Current Occupancy</label>
+                <input type="number" id="shelOccupancy" min="0" placeholder="0" required/>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shelWater">Water Supply</label>
+                <select id="shelWater">
+                  <option value="Adequate">Adequate</option>
+                  <option value="Limited">Limited</option>
+                  <option value="Critical">Critical</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="shelMedical">Medical Staff</label>
+                <select id="shelMedical">
+                  <option value="Present">Present</option>
+                  <option value="Limited">Limited</option>
+                  <option value="None">None</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="shelContact">Contact / Manager</label>
+              <input type="text" id="shelContact" placeholder="Name and phone number"/>
+            </div>
+            <button type="submit" class="btn btn-primary full-width">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Register Shelter
+            </button>
+          </form>
+        </div>
+
+        <!-- Shelter Cards -->
+        <div class="shelters-column">
+          <div class="card-header standalone">
+            <h3>Active Shelters <span class="count-badge" id="shelterTotal">0</span></h3>
+            <div class="overall-capacity">
+              <span id="overallCapText">0 / 0 total capacity</span>
+              <div class="capacity-bar-wrap">
+                <div class="capacity-bar-fill" id="overallCapBar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="shelter-list" id="shelterList">
+            <div class="empty-state" id="shelterEmpty">
+              <div class="empty-icon">🏥</div>
+              <p>No shelters registered yet.</p>
+              <p class="empty-sub">Add a shelter using the form.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────
+         TAB: REPORT GENERATOR
+    ───────────────────────────────────── -->
+    <section class="tab-section" id="tab-reports">
+      <div class="report-layout">
+        <!-- Report Controls -->
+        <div class="card report-controls-card">
+          <div class="card-header">
+            <h3>Report Configuration</h3>
+          </div>
+          <div class="app-form">
+            <div class="form-group">
+              <label>Report Type</label>
+              <div class="report-type-selector" id="reportTypeSelector">
+                <button class="report-type-btn active" data-type="executive" id="rtExec">
+                  <span class="rt-icon">📊</span>
+                  <span class="rt-label">Executive Summary</span>
+                  <span class="rt-sub">For decision makers</span>
+                </button>
+                <button class="report-type-btn" data-type="field" id="rtField">
+                  <span class="rt-icon">🚨</span>
+                  <span class="rt-label">Field Ops Report</span>
+                  <span class="rt-sub">For responders</span>
+                </button>
+                <button class="report-type-btn" data-type="public" id="rtPublic">
+                  <span class="rt-icon">📢</span>
+                  <span class="rt-label">Public Bulletin</span>
+                  <span class="rt-sub">For public release</span>
+                </button>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="rptDateFrom">From Date</label>
+                <input type="date" id="rptDateFrom"/>
+              </div>
+              <div class="form-group">
+                <label for="rptDateTo">To Date</label>
+                <input type="date" id="rptDateTo"/>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="rptRegion">Region Filter</label>
+              <select id="rptRegion">
+                <option value="all">All Regions</option>
+                <option value="Zone A – Ardena">Zone A – Ardena</option>
+                <option value="Zone B – Braxton">Zone B – Braxton</option>
+                <option value="Zone C – Cordell">Zone C – Cordell</option>
+                <option value="Zone D – Delvar">Zone D – Delvar</option>
+                <option value="Zone E – Elvira">Zone E – Elvira</option>
+                <option value="Zone F – Farentino">Zone F – Farentino</option>
+                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="rptAuthor">Prepared By</label>
+              <input type="text" id="rptAuthor" placeholder="Name / Department"/>
+            </div>
+            <div class="form-group">
+              <label for="rptNotes">Additional Notes</label>
+              <textarea id="rptNotes" rows="3" placeholder="Any additional context for the report..."></textarea>
+            </div>
+            <button class="btn btn-primary full-width" id="generateReportBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Generate Report Preview
+            </button>
+            <button class="btn btn-secondary full-width" id="exportPdfBtn" style="margin-top: 10px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export as PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Report Preview -->
+        <div class="card report-preview-card">
+          <div class="card-header">
+            <h3>Report Preview</h3>
+            <button class="btn btn-sm" id="printBtn">🖨 Print</button>
+          </div>
+          <div class="report-preview" id="reportPreview">
+            <div class="empty-state">
+              <div class="empty-icon">📄</div>
+              <p>Configure and generate a report.</p>
+              <p class="empty-sub">Your report preview will appear here.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─────────────────────────────────────
+         TAB: INDIA ANALYSIS
+    ───────────────────────────────────── -->
+    <section class="tab-section" id="tab-india">
+
+      <!-- India Sub-Tab Nav -->
+      <div class="india-subtab-nav">
+        <button class="india-subtab active" data-subtab="overview" id="ist-overview">🗺️ Overview</button>
+        <button class="india-subtab" data-subtab="states" id="ist-states">📊 State Analysis</button>
+        <button class="india-subtab" data-subtab="districts" id="ist-districts">🔥 District Hotspots</button>
+        <button class="india-subtab" data-subtab="health" id="ist-health">🏥 Health Impact</button>
+        <button class="india-subtab" data-subtab="history" id="ist-history">📅 Historical Events</button>
+        <button class="india-subtab live-tab" data-subtab="livedata" id="ist-livedata">🌐 Live Data Feed</button>
+      </div>
+
+      <!-- ── SUB-TAB: OVERVIEW ── -->
+      <div class="india-sub active" id="isub-overview">
+
+        <!-- IMD National Alert Strip -->
+        <div class="imd-alert-strip">
+          <div class="imd-strip-title">🌡️ IMD National Heat Wave Status — June 18, 2026</div>
+          <div class="imd-zones">
+            <div class="imd-zone red">🔴 <strong>Red Alert</strong><span>North, Central India</span></div>
+            <div class="imd-zone orange">🟠 <strong>Orange Alert</strong><span>East India, Deccan</span></div>
+            <div class="imd-zone yellow">🟡 <strong>Yellow Alert</strong><span>West, South India</span></div>
+            <div class="imd-zone green">🟢 <strong>Normal</strong><span>Northeast, Islands</span></div>
+          </div>
+        </div>
+
+        <!-- National Stats -->
+        <div class="stats-grid">
+          <div class="stat-card heat">
+            <div class="stat-icon">🌡️</div>
+            <div class="stat-body"><div class="stat-value">50.5°C</div><div class="stat-label">Peak Temp (Churu, RJ)</div><div class="stat-sub trend-up">↑ +2.1° above 2025 peak</div></div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-icon">🗺️</div>
+            <div class="stat-body"><div class="stat-value">22</div><div class="stat-label">States Affected</div><div class="stat-sub trend-up">↑ +5 from last week</div></div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon">💀</div>
+            <div class="stat-body"><div class="stat-value">312</div><div class="stat-label">Heat Deaths (National)</div><div class="stat-sub trend-up">↑ +47 in last 24h</div></div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon">🏥</div>
+            <div class="stat-body"><div class="stat-value">18,450</div><div class="stat-label">Hospitalizations</div><div class="stat-sub trend-up">↑ +2,310 in last 24h</div></div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">🪖</div>
+            <div class="stat-body"><div class="stat-value">147</div><div class="stat-label">NDRF Teams Deployed</div><div class="stat-sub">Across 14 states</div></div>
+          </div>
+          <div class="stat-card safe">
+            <div class="stat-icon">🏠</div>
+            <div class="stat-body"><div class="stat-value">4,820</div><div class="stat-label">Cooling Centres</div><div class="stat-sub">Operational nationwide</div></div>
+          </div>
+        </div>
+
+        <!-- India Map + Alert Donut -->
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header"><h3>India Heat Risk Map — State Level</h3><span class="card-badge">Live IMD Feed</span></div>
+            <div id="indiaMap" class="india-map"></div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header"><h3>Alert Level Breakdown</h3></div>
+            <div class="chart-wrap" style="height:200px">
+              <canvas id="alertDonutChart"></canvas>
+            </div>
+            <div class="imd-legend">
+              <div class="imd-leg-item"><span class="imd-dot red-dot"></span>Red Alert — 8 states</div>
+              <div class="imd-leg-item"><span class="imd-dot orange-dot"></span>Orange Alert — 7 states</div>
+              <div class="imd-leg-item"><span class="imd-dot yellow-dot"></span>Yellow Alert — 5 states</div>
+              <div class="imd-leg-item"><span class="imd-dot green-dot"></span>Normal — 2 states</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- State temp bar chart -->
+        <div class="card">
+          <div class="card-header"><h3>Peak Temperature by State</h3><span class="card-badge">Top 15 states</span></div>
+          <div class="chart-wrap" style="height:260px">
+            <canvas id="stateTempBarChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── SUB-TAB: STATE ANALYSIS ── -->
+      <div class="india-sub" id="isub-states">
+        <div class="card">
+          <div class="card-header">
+            <h3>State-Wise Heat Wave Analysis <span class="count-badge" id="stateCount">22</span></h3>
+            <div class="filter-row">
+              <select id="filterStateRegion" class="small-select">
+                <option value="all">All Regions</option>
+                <option value="North">North India</option>
+                <option value="South">South India</option>
+                <option value="East">East India</option>
+                <option value="West">West India</option>
+                <option value="Central">Central India</option>
+                <option value="Northeast">Northeast</option>
+              </select>
+              <select id="filterIMDAlert" class="small-select">
+                <option value="all">All Alerts</option>
+                <option value="Red">🔴 Red Alert</option>
+                <option value="Orange">🟠 Orange Alert</option>
+                <option value="Yellow">🟡 Yellow Alert</option>
+                <option value="Normal">🟢 Normal</option>
+              </select>
+              <select id="sortStates" class="small-select">
+                <option value="temp">Sort: Temperature</option>
+                <option value="deaths">Sort: Deaths</option>
+                <option value="hosp">Sort: Hospitalizations</option>
+              </select>
+            </div>
+          </div>
+          <div class="risk-table-wrap">
+            <table class="risk-table state-table" id="stateTable">
+              <thead>
+                <tr>
+                  <th>State</th>
+                  <th>Region</th>
+                  <th>Peak Temp</th>
+                  <th>IMD Alert</th>
+                  <th>Heat Deaths</th>
+                  <th>Hospitalized</th>
+                  <th>NDRF Status</th>
+                  <th>HAP Status</th>
+                </tr>
+              </thead>
+              <tbody id="stateTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SUB-TAB: DISTRICT HOTSPOTS ── -->
+      <div class="india-sub" id="isub-districts">
+        <div class="districts-layout">
+          <div class="card">
+            <div class="card-header"><h3>🔥 Top District Hotspots</h3><span class="card-badge">Ranked by Heat Index</span></div>
+            <div class="risk-table-wrap">
+              <table class="risk-table" id="districtTable">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>District</th>
+                    <th>State</th>
+                    <th>Max Temp</th>
+                    <th>5-Day Avg</th>
+                    <th>Humidity</th>
+                    <th>Heat Index</th>
+                    <th>Alert</th>
+                  </tr>
+                </thead>
+                <tbody id="districtTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Temperature Distribution by Zone</h3></div>
+            <div class="chart-wrap" style="height:280px">
+              <canvas id="districtTempChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SUB-TAB: HEALTH IMPACT ── -->
+      <div class="india-sub" id="isub-health">
+        <!-- Vulnerable Population Cards -->
+        <div class="vuln-grid">
+          <div class="vuln-card">
+            <div class="vuln-icon">👴</div>
+            <div class="vuln-body">
+              <div class="vuln-title">Elderly (60+)</div>
+              <div class="vuln-value">HIGH RISK</div>
+              <div class="vuln-detail">~14.2 crore exposed</div>
+              <div class="vuln-bar-wrap"><div class="vuln-bar" style="width:85%;background:#D62839"></div></div>
+            </div>
+          </div>
+          <div class="vuln-card">
+            <div class="vuln-icon">👷</div>
+            <div class="vuln-body">
+              <div class="vuln-title">Outdoor Workers</div>
+              <div class="vuln-value">EXTREME</div>
+              <div class="vuln-detail">~45 crore at risk</div>
+              <div class="vuln-bar-wrap"><div class="vuln-bar" style="width:95%;background:#D62839"></div></div>
+            </div>
+          </div>
+          <div class="vuln-card">
+            <div class="vuln-icon">🧒</div>
+            <div class="vuln-body">
+              <div class="vuln-title">Children Under 5</div>
+              <div class="vuln-value">HIGH RISK</div>
+              <div class="vuln-detail">~11.8 crore exposed</div>
+              <div class="vuln-bar-wrap"><div class="vuln-bar" style="width:80%;background:#FF6B35"></div></div>
+            </div>
+          </div>
+          <div class="vuln-card">
+            <div class="vuln-icon">🌆</div>
+            <div class="vuln-body">
+              <div class="vuln-title">Urban Heat Islands</div>
+              <div class="vuln-value">+4.2°C Above</div>
+              <div class="vuln-detail">Delhi, Mumbai, Ahmedabad, Nagpur, Hyderabad</div>
+              <div class="vuln-bar-wrap"><div class="vuln-bar" style="width:75%;background:#F7A731"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header"><h3>Deaths vs Hospitalizations — Top 10 States</h3></div>
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="healthImpactChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header"><h3>Daily Fatality Trend (June 2026)</h3></div>
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="fatalityTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hospital Capacity Gauges -->
+        <div class="card">
+          <div class="card-header"><h3>Regional Hospital Capacity — Heat Illness ICU Demand</h3></div>
+          <div class="hospital-gauges" id="hospitalGauges"></div>
+        </div>
+      </div>
+
+      <!-- ── SUB-TAB: HISTORICAL ── -->
+      <div class="india-sub" id="isub-history">
+        <div class="card">
+          <div class="card-header"><h3>Major Indian Heat Waves — Historical Comparison</h3><span class="card-badge">2002–2026</span></div>
+          <div class="chart-wrap" style="height:300px">
+            <canvas id="indiaHistoricalChart"></canvas>
+          </div>
+        </div>
+
+        <div class="historical-timeline" id="historicalTimeline"></div>
+      </div>
+
+      <!-- ── SUB-TAB: LIVE DATA FEED ── -->
+      <div class="india-sub" id="isub-livedata">
+
+        <!-- Data Source Status -->
+        <div class="live-header-row">
+          <div class="live-title">
+            <span class="live-pulse-dot"></span>
+            <h3>Live Meteorological Data Feed</h3>
+          </div>
+          <div class="live-meta">
+            <span id="liveDataLastUpdate" style="font-size:12px;color:var(--text-muted)">Fetching…</span>
+            <button class="btn-sm" id="refreshLiveBtn">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <!-- Data Source Status Panel -->
+        <div class="card">
+          <div class="card-header"><h3>📡 Connected Data Sources</h3></div>
+          <div id="dataSourcesPanel" class="datasources-grid"></div>
+        </div>
+
+        <!-- City Weather Grid -->
+        <div class="card">
+          <div class="card-header"><h3>🌡️ Real-Time City Weather — Open-Meteo API</h3><span class="card-badge">15 Cities · Live</span></div>
+          <div id="cityWeatherGrid" class="city-weather-grid"></div>
+        </div>
+
+        <!-- 7-Day Forecast + ERA5 Archive Row -->
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header">
+              <h3 id="forecastCityTitle">7-Day Forecast — Select a City Above</h3>
+              <span class="card-badge">Open-Meteo · WMO Standard</span>
+            </div>
+            <div class="chart-wrap" style="height:280px">
+              <canvas id="forecastChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>June 2026 Archive — Delhi (ERA5)</h3>
+              <span class="card-badge">Open-Meteo Archive</span>
+            </div>
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="historicalTrendChart"></canvas>
+            </div>
+            <div id="archiveSourceLabel" style="font-size:10px;color:var(--text-muted);margin-top:6px;padding:0 4px"></div>
+          </div>
+        </div>
+
+        <!-- NASA POWER + NOAA ENSO Row -->
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header"><h3>🛰️ NASA POWER — 30-Day Climate Analysis</h3><span class="card-badge">MERRA-2 Reanalysis</span></div>
+            <div id="nasaPowerPanel" class="nasa-power-panel">
+              <div class="data-loading">🛰️ Fetching NASA POWER data…</div>
+            </div>
+            <div class="chart-wrap" style="height:220px;margin-top:12px">
+              <canvas id="nasaPowerChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header"><h3>🌊 NOAA ENSO Index</h3><span class="card-badge">ONI · NOAA CPC</span></div>
+            <div id="ensoPanel">
+              <div class="data-loading">🌊 Fetching NOAA ENSO index…</div>
+            </div>
+            <div style="margin-top:20px">
+              <div class="card-header" style="margin-top:16px"><h3>🔥 NASA FIRMS Fire Detection</h3></div>
+              <div id="firmsPanel">
+                <div class="data-loading">🛰️ Awaiting NASA FIRMS MAP_KEY…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Configuration -->
+        <div class="card">
+          <div class="card-header"><h3>🔑 API Configuration</h3><span class="card-badge">Optional — Extends functionality</span></div>
+          <div class="api-config-grid">
+            <div class="api-config-item">
+              <label class="api-label">NASA FIRMS MAP_KEY <span class="api-link"><a href="https://firms.modaps.eosdis.nasa.gov/api/map_key" target="_blank">Get free key ↗</a></span></label>
+              <div class="api-input-row">
+                <input type="text" id="firmsKeyInput" class="api-input" placeholder="Paste your NASA FIRMS MAP_KEY here…" />
+              </div>
+              <div class="api-note">Adds live fire hotspot WMS overlay on the India Map. Free — instant approval.</div>
+            </div>
+            <div class="api-config-item">
+              <label class="api-label">OpenWeatherMap API Key <span class="api-note-inline">(CORS-restricted — backend use only)</span></label>
+              <div class="api-input-row api-disabled">
+                <input type="text" class="api-input" placeholder="OWM is CORS-blocked in browser environments" disabled />
+              </div>
+              <div class="api-note">❌ OWM does not send CORS headers — incompatible with browser-only apps. Use Open-Meteo instead (already integrated, free, no key).</div>
+            </div>
+          </div>
+          <button class="btn-primary" id="saveApiKeysBtn" style="margin-top:16px">💾 Save Keys &amp; Connect</button>
+          <div style="margin-top:14px;padding:12px;background:rgba(76,201,240,0.06);border:1px solid rgba(76,201,240,0.2);border-radius:8px;font-size:12px;color:var(--text-secondary);line-height:1.7">
+            <strong style="color:var(--info-blue)">📋 Data Source Summary:</strong><br>
+            ✅ <strong>Open-Meteo</strong> — Real-time weather + 7-day forecast for 15 Indian cities. Free, no key, CORS-safe.<br>
+            ✅ <strong>Open-Meteo Archive (ERA5)</strong> — June 2026 historical temperature/humidity. Free, no key, CORS-safe.<br>
+            ⚠️ <strong>NASA POWER (MERRA-2)</strong> — 30-day climate analysis, New Delhi. Free, no key. CORS varies.<br>
+            ⚠️ <strong>NOAA ENSO/ONI</strong> — Current El Niño/La Niña phase. Fetched via corsproxy.io; falls back to advisory data.<br>
+            🔑 <strong>NASA FIRMS</strong> — Live fire hotspot WMS overlay. Requires free MAP_KEY from NASA.<br>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════════════════════════
+       TOAST NOTIFICATIONS
+  ═══════════════════════════════════════ -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- External Libraries -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+
+  <!-- Live Data Integration -->
+  <script src="live-data.js"></script>
+
+</body>
+</html>
