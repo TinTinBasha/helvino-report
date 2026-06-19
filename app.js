@@ -263,9 +263,9 @@ function switchTab(tabName) {
     setTimeout(initIndiaMap, 100);
   }
 
-  // On mobile, close sidebar
-  if (window.innerWidth < 768) {
-    document.getElementById('sidebar').classList.remove('open');
+  // On mobile, close sidebar after tab switch
+  if (APP._closeSidebar) {
+    APP._closeSidebar();
   }
 }
 
@@ -274,15 +274,41 @@ function initSidebar() {
   const sidebar  = document.getElementById('sidebar');
   const mainCont = document.querySelector('.main-content');
   const toggleBtn = document.getElementById('sidebarToggle');
+  const overlay = document.getElementById('sidebarOverlay');
+
+  APP._closeSidebar = () => {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('visible');
+  };
 
   toggleBtn.addEventListener('click', () => {
-    if (window.innerWidth < 768) {
+    if (window.innerWidth <= 768) {
       sidebar.classList.toggle('open');
+      if (overlay) {
+        if (sidebar.classList.contains('open')) {
+          overlay.classList.add('visible');
+        } else {
+          overlay.classList.remove('visible');
+        }
+      }
     } else {
       sidebar.classList.toggle('collapsed');
       mainCont.classList.toggle('expanded');
     }
   });
+
+  const closeBtn = document.getElementById('sidebarClose');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      if (APP._closeSidebar) APP._closeSidebar();
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener('click', () => {
+      if (APP._closeSidebar) APP._closeSidebar();
+    });
+  }
 
   document.getElementById('bannerClose').addEventListener('click', () => {
     document.getElementById('alertBanner').classList.add('hidden');

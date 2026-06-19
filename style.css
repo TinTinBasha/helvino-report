@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    El Niño HEAT WAVE REPORT TOOL — DESIGN SYSTEM
    ═══════════════════════════════════════════════════════════ */
 
@@ -46,6 +46,12 @@
   /* Transitions */
   --trans-fast:     all 0.15s ease;
   --trans-smooth:   all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Safe area (iPhone notch/Dynamic Island) */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 }
 
 /* ── Reset & Base ────────────────────────────────────────── */
@@ -83,6 +89,7 @@ body {
   left: 0; top: 0;
   z-index: 100;
   transition: var(--trans-smooth);
+  overscroll-behavior: contain;
 }
 
 .sidebar.collapsed { left: calc(var(--sidebar-w) * -1); }
@@ -94,6 +101,10 @@ body {
   gap: 12px;
   padding: 24px 20px 20px;
   border-bottom: 1px solid var(--bg-border);
+}
+
+.sidebar-close {
+  display: none;
 }
 
 .brand-icon {
@@ -253,7 +264,7 @@ body {
   padding: 0 24px;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 2100;
   backdrop-filter: blur(10px);
 }
 
@@ -265,6 +276,9 @@ body {
   border-radius: var(--radius-sm);
   display: flex; align-items: center; justify-content: center;
   transition: var(--trans-fast);
+  min-width: 44px;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
 .sidebar-toggle:hover { background: var(--bg-card); color: var(--text-primary); }
@@ -275,6 +289,10 @@ body {
   font-weight: 700;
   color: var(--text-primary);
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .topbar-actions {
@@ -382,6 +400,7 @@ body {
   padding: 20px;
   box-shadow: var(--shadow-card);
   transition: var(--trans-fast);
+  min-width: 0;
 }
 
 .card.compact { padding: 14px 16px; }
@@ -491,12 +510,14 @@ body {
   gap: 16px;
 }
 
-.chart-card { overflow: hidden; }
+.chart-card { overflow: hidden; min-width: 0; }
 .chart-card.wide { grid-column: 1; }
 
 .chart-wrap {
   height: 220px;
   position: relative;
+  width: 100%;
+  overflow: hidden;
 }
 
 .chart-wrap.short { height: 180px; }
@@ -582,6 +603,8 @@ body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--bg-border);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 .map-controls {
@@ -1084,6 +1107,7 @@ textarea { resize: vertical; min-height: 80px; }
   font-size: 13px;
   line-height: 1.7;
   overflow-y: auto;
+  overflow-x: auto;
   max-height: 70vh;
 }
 
@@ -1314,8 +1338,29 @@ textarea { resize: vertical; min-height: 80px; }
 .map-popup .pop-val { font-weight: 600; }
 
 /* ═══════════════════════════════════════════════════════════
-   RESPONSIVE
+   RESPONSIVE — FULL DEVICE COVERAGE
+   Breakpoints:
+     xs  : < 480px   (small phones: iPhone SE, Galaxy A)
+     sm  : < 640px   (large phones: iPhone 15, Pixel)
+     md  : < 768px   (tablets portrait, large phones landscape)
+     lg  : < 1024px  (tablets landscape, small laptops)
+     xl  : < 1280px  (standard laptops)
+     2xl : ≥ 1280px  (desktops — default styles above)
    ═══════════════════════════════════════════════════════════ */
+
+/* ── LARGE SCREENS 1024–1280px (small laptops) ─────────────── */
+@media (max-width: 1280px) {
+  :root { --sidebar-w: 240px; }
+
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .charts-row { grid-template-columns: 3fr 2fr; }
+  .bottom-row { grid-template-columns: 3fr 2fr; }
+  .two-col-layout { grid-template-columns: 340px 1fr; }
+  .imd-zones { grid-template-columns: repeat(2, 1fr); }
+  .vuln-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── TABLET LANDSCAPE / SMALL LAPTOPS ≤ 1024px ─────────────── */
 @media (max-width: 1024px) {
   .charts-row { grid-template-columns: 1fr; }
   .bottom-row { grid-template-columns: 1fr; }
@@ -1323,25 +1368,285 @@ textarea { resize: vertical; min-height: 80px; }
   .form-card { position: static; }
   .report-layout { grid-template-columns: 1fr; }
   .report-controls-card { position: static; }
-  .map-controls { grid-template-columns: 1fr; }
+  .map-controls { grid-template-columns: repeat(2, 1fr); }
+  .districts-layout { grid-template-columns: 1fr; }
+  .api-config-grid { grid-template-columns: 1fr; }
+  .nasa-stats { grid-template-columns: repeat(3, 1fr); }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .vuln-grid { grid-template-columns: repeat(2, 1fr); }
+  .imd-zones { grid-template-columns: repeat(2, 1fr); }
+  .city-weather-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ── TABLET PORTRAIT / LARGE PHONES LANDSCAPE ≤ 768px ──────── */
 @media (max-width: 768px) {
-  :root { --sidebar-w: 240px; }
-  .sidebar { left: calc(var(--sidebar-w) * -1); }
+  :root {
+    --sidebar-w: 260px;
+    --topbar-h: 56px;
+  }
+
+  /* Sidebar: slide in as drawer on mobile */
+  .sidebar {
+    left: calc(var(--sidebar-w) * -1);
+    z-index: 2000;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.6);
+  }
   .sidebar.open { left: 0; }
-  .main-content { margin-left: 0; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
-  .tab-section { padding: 16px; }
-  .rpt-stat-row { grid-template-columns: 1fr 1fr; }
+  .main-content { margin-left: 0 !important; overflow-x: hidden; }
+  .sidebar-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card);
+    border: 1px solid var(--bg-border);
+    color: var(--text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    transition: var(--trans-fast);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .sidebar-close:hover {
+    color: var(--text-primary);
+    border-color: var(--heat-orange);
+  }
+
+  /* Topbar */
+  .topbar { padding: 0 14px; gap: 10px; }
+  .topbar-title { font-size: 15px; }
+  .alert-indicator span { display: none; } /* hide text, show icon only */
+  .alert-indicator { padding: 8px 10px; gap: 0; }
+
+  /* Tab content */
+  .tab-section { padding: 14px; gap: 14px; }
+
+  /* Stats */
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .stat-card { padding: 14px; gap: 10px; }
+  .stat-value { font-size: 22px; }
+  .stat-icon { font-size: 24px; }
+
+  /* Charts */
+  .chart-wrap { height: 200px !important; }
+  .charts-row { gap: 12px; }
+
+  /* India sub-tab nav */
+  .india-subtab-nav {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    gap: 4px;
+    width: 100%;
+    max-width: 100%;
+  }
+  .india-subtab-nav::-webkit-scrollbar { display: none; }
+  .india-subtab { font-size: 11px; padding: 8px 12px; white-space: nowrap; flex-shrink: 0; }
+
+
+  /* India map */
+  .india-map { height: 260px !important; }
+  .heat-map  { min-height: 300px; }
+
+  /* IMD zones */
+  .imd-zones { grid-template-columns: repeat(2, 1fr); }
+  .vuln-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Tables — horizontal scroll */
+  .risk-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .risk-table { font-size: 12px; }
+  .risk-table th, .risk-table td { padding: 8px 10px; white-space: nowrap; }
+
+  /* Incidents & Shelters */
+  .two-col-layout { grid-template-columns: 1fr; }
+  .form-card { position: static; }
+  .incident-list { max-height: none; }
+  .form-row { grid-template-columns: 1fr; gap: 10px; }
+
+  /* Map controls */
+  .map-controls { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Report */
+  .rpt-stat-row { grid-template-columns: repeat(2, 1fr); }
+  .report-layout { grid-template-columns: 1fr; }
+  .report-controls-card { position: static; }
+
+  /* Alert banner */
+  .alert-banner { flex-wrap: wrap; font-size: 12px; padding: 10px 14px; gap: 8px; }
+
+  /* City weather */
+  .city-weather-grid { grid-template-columns: repeat(2, 1fr); }
+  .nasa-stats { grid-template-columns: repeat(2, 1fr); }
+
+  /* Filter row wrap */
+  .filter-row { flex-wrap: wrap; gap: 6px; }
+  .small-select { flex: 1; min-width: 100px; }
+
+  /* Card padding */
+  .card { padding: 14px; }
+  .card-header { margin-bottom: 12px; }
+  .card-header h3 { font-size: 13px; }
 }
 
+/* ── MOBILE PORTRAIT ≤ 480px (standard phones) ──────────────── */
 @media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .form-row { grid-template-columns: 1fr; }
-  .topbar { padding: 0 14px; }
-  .alert-banner { flex-wrap: wrap; font-size: 12px; }
+  :root { --topbar-h: 52px; }
+
+  /* Topbar compact */
+  .topbar { padding: 0 12px; gap: 8px; }
+  .topbar-title { font-size: 13px; }
+  .alert-indicator { display: none; } /* hide on very small screens */
+
+  /* Tab content */
+  .tab-section { padding: 10px; gap: 10px; }
+
+  /* Stats: single column */
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat-card { padding: 12px; gap: 8px; }
+  .stat-icon { font-size: 20px; }
+  .stat-value { font-size: 18px; }
+  .stat-label { font-size: 11px; }
+  .stat-sub { font-size: 10px; }
+
+  /* Charts */
+  .chart-wrap { height: 180px !important; }
+
+  /* Cards */
+  .card { padding: 12px; border-radius: var(--radius-md); }
+  .card-header { gap: 8px; margin-bottom: 10px; }
+  .card-header h3 { font-size: 12px; }
+  .card-badge { font-size: 10px; padding: 3px 8px; }
+
+  /* IMD zones */
+  .imd-zones { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .imd-zone { padding: 8px 10px; }
+
+  /* Vulnerable grid: single column */
+  .vuln-grid { grid-template-columns: 1fr; gap: 8px; }
+  .vuln-card { padding: 12px; }
+
+  /* India map */
+  .india-map { height: 220px !important; }
+  .heat-map { min-height: 250px; }
+
+  /* India sub-tab nav — horizontal scroll with smaller buttons */
+  .india-subtab-nav { gap: 3px; }
+  .india-subtab { font-size: 10px; padding: 7px 10px; }
+
+  /* Tables */
+  .risk-table { font-size: 11px; }
+  .risk-table th, .risk-table td { padding: 7px 8px; }
+
+  /* Incident items */
+  .incident-item { padding: 10px 12px; }
+  .inc-actions { flex-direction: column; gap: 4px; }
+  .inc-actions .btn { width: 100%; justify-content: center; }
+
+  /* Forms */
+  .app-form { gap: 10px; }
+  input, select, textarea { padding: 9px 12px; font-size: 13px; }
+  .btn { padding: 10px 16px; font-size: 13px; }
+
+  /* Report Preview */
+  .report-preview { padding: 16px; }
+
+  /* Report stats */
+  .rpt-stat-row { grid-template-columns: 1fr; gap: 8px; }
+
+  /* City weather: single column */
+  .city-weather-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cwc-temp { font-size: 20px; }
+  .cwc-city { font-size: 11px; }
+
+  /* NASA stats */
+  .nasa-stats { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .nasa-val { font-size: 18px; }
+
+  /* ENSO card */
+  .enso-phase { font-size: 15px; }
+
+  /* Hospital gauges */
+  .hospital-gauges { grid-template-columns: 1fr 1fr; }
+
+  /* Historical timeline */
+  .historical-timeline { grid-template-columns: 1fr; }
+
+  /* Filter row */
+  .filter-row { flex-direction: column; }
+  .small-select { width: 100% !important; }
+
+  /* API config */
+  .api-config-grid { grid-template-columns: 1fr; }
+
+  /* Live header */
+  .live-header-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+
+  /* Alert banner */
+  .alert-banner { font-size: 11px; padding: 8px 12px; }
+
+  /* Sidebar brand compact */
+  .brand-name { font-size: 15px; }
+  .sidebar-footer { padding: 12px 16px; }
+  .live-clock { font-size: 20px; }
 }
+
+/* ── VERY SMALL PHONES ≤ 360px (Galaxy A14, older iPhones) ─── */
+@media (max-width: 360px) {
+  .tab-section { padding: 8px; gap: 8px; }
+  .stats-grid { grid-template-columns: 1fr; }
+  .city-weather-grid { grid-template-columns: 1fr; }
+  .imd-zones { grid-template-columns: 1fr; }
+  .hospital-gauges { grid-template-columns: 1fr; }
+  .nasa-stats { grid-template-columns: 1fr; }
+  .cwc-stats { justify-content: flex-start; }
+  .india-subtab { font-size: 9px; padding: 6px 8px; }
+  .topbar-title { display: none; } /* save space on tiny screens */
+}
+
+/* ── MOBILE OVERLAY — backdrop when sidebar open ────────────── */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1990;
+  backdrop-filter: blur(2px);
+  animation: fade-in 0.2s ease;
+}
+
+.sidebar-overlay.visible { display: block; }
+
+/* ── TOUCH IMPROVEMENTS ─────────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets for touch devices */
+  .nav-item { padding: 13px 14px; min-height: 48px; }
+  .btn { min-height: 44px; }
+  .india-subtab { min-height: 40px; }
+  .incident-item { padding: 14px 16px; }
+  input, select { min-height: 44px; }
+  .btn-icon { width: 40px; height: 40px; }
+  .city-weather-card { min-height: 140px; }
+
+  /* Remove hover effects that don't work on touch */
+  .stat-card:hover { transform: none; }
+  .timeline-card:hover { transform: none; }
+  .vuln-card:hover { transform: none; }
+  .city-weather-card:hover { transform: none; }
+}
+
+/* ── PRINT MEDIA ────────────────────────────────────────────── */
+@media print {
+  .sidebar, .topbar, .alert-banner, .toast-container { display: none !important; }
+  .main-content { margin-left: 0 !important; }
+  .tab-section.active { display: block !important; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  body { background: #fff; color: #000; }
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    INDIA ANALYSIS MODULE
@@ -1438,6 +1743,8 @@ textarea { resize: vertical; min-height: 80px; }
   height: 380px;
   border-radius: var(--radius-md);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 /* ── IMD Legend (donut card) ─────────────────────────────── */
