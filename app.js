@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   HELVINO HEAT WAVE REPORT TOOL — APP.JS
+   El Niño HEAT WAVE REPORT TOOL — APP.JS
    ═══════════════════════════════════════════════════════════ */
 
 'use strict';
@@ -16,7 +16,7 @@ const APP = {
   charts: {}
 };
 
-// ── Sample Helvino Data ───────────────────────────────────────
+// ── Sample El Niño Data ───────────────────────────────────────
 const REGIONS = [
   { name: 'Zone A – Ardena',    temp: 48.7, humidity: 22, population: '1.2M', risk: 'extreme', lat: 37.5,  lng: 15.1  },
   { name: 'Zone B – Braxton',   temp: 46.3, humidity: 25, population: '890K', risk: 'extreme', lat: 38.0,  lng: 15.8  },
@@ -47,7 +47,7 @@ const HUMIDITY_DATA = TEMP_HOURS.labels.map((_, i) => +(45 - i * 0.3 + (Math.ran
 const HEAT_INDEX_DATA = TEMP_HOURS.maxTemps.map((t, i) => +(t + HUMIDITY_DATA[i] * 0.1).toFixed(1));
 
 const HISTORICAL = {
-  labels: ['Helvino 2026', 'Torrefina 2022', 'Brazzos 2019', 'Calida 2017', 'Ignear 2015'],
+  labels: ['El Niño 2026', 'Torrefina 2022', 'Brazzos 2019', 'Calida 2017', 'Ignear 2015'],
   peakTemps: [48.7, 44.1, 42.8, 45.3, 41.2],
   fatalities: [12, 38, 19, 54, 22],
   duration: [9, 12, 7, 14, 8]
@@ -99,7 +99,7 @@ const INDIA_DISTRICTS = [
 
 const INDIA_HISTORICAL_EVENTS = [
   {
-    year: '2026', name: 'Helvino / National Crisis', states: 22, peakTemp: 50.5,
+    year: '2026', name: 'El Niño / National Crisis', states: 22, peakTemp: 50.5,
     deaths: 312, hosp: 18450, duration: 'Ongoing',
     lesson: '<strong>Ongoing event.</strong> Unprecedented multi-state coverage. IMD Red Alert across North & Central India. NDRF deployed in 14 states. Largest cooling centre network ever activated (4,820 centres).',
     current: true
@@ -187,14 +187,15 @@ function showToast(message, type = 'info', icon = '') {
 }
 
 function saveData() {
-  localStorage.setItem('helvino_incidents', JSON.stringify(APP.incidents));
-  localStorage.setItem('helvino_shelters', JSON.stringify(APP.shelters));
+  localStorage.setItem('elnino_incidents', JSON.stringify(APP.incidents));
+  localStorage.setItem('elnino_shelters', JSON.stringify(APP.shelters));
 }
 
 function loadData() {
   try {
-    APP.incidents = JSON.parse(localStorage.getItem('helvino_incidents') || '[]');
-    APP.shelters  = JSON.parse(localStorage.getItem('helvino_shelters')  || '[]');
+    // Support both old 'helvino_*' keys and new 'elnino_*' keys for backwards compat
+    APP.incidents = JSON.parse(localStorage.getItem('elnino_incidents') || localStorage.getItem('helvino_incidents') || '[]');
+    APP.shelters  = JSON.parse(localStorage.getItem('elnino_shelters')  || localStorage.getItem('helvino_shelters')  || '[]');
   } catch (e) {
     APP.incidents = [];
     APP.shelters  = [];
@@ -981,7 +982,7 @@ function generateReportPreview() {
   const from    = document.getElementById('rptDateFrom').value;
   const to      = document.getElementById('rptDateTo').value;
   const region  = document.getElementById('rptRegion').value;
-  const author  = document.getElementById('rptAuthor').value || 'Helvino Emergency Operations Center';
+  const author  = document.getElementById('rptAuthor').value || 'El Niño Emergency Operations Center';
   const notes   = document.getElementById('rptNotes').value;
   const type    = APP.reportType;
   const now     = new Date();
@@ -1014,10 +1015,10 @@ function generateReportPreview() {
 
   let html = `
     <div class="rpt-header">
-      <span class="rpt-logo">HELVINO</span>
+      <span class="rpt-logo">El Niño</span>
       <h1>${reportTitles[type]}</h1>
       <div class="rpt-meta">
-        Heat Wave Helvino — ${regionStr}<br>
+        Heat Wave El Niño — ${regionStr}<br>
         Period: ${from || 'N/A'} to ${to || 'N/A'} &nbsp;|&nbsp;
         Generated: ${formatDate(now)}<br>
         Prepared by: <strong>${author}</strong>
@@ -1029,7 +1030,7 @@ function generateReportPreview() {
     html += `
       <div class="rpt-section">
         <h2>Situation Overview</h2>
-        <p>Heat Wave Helvino continues to impact ${regionStr} with peak temperatures reaching <strong>48.7°C</strong> in Zone A–Ardena. This event is classified as <strong>EXTREME</strong> and poses severe risk to public health and critical infrastructure.</p>
+        <p>Heat Wave El Niño continues to impact ${regionStr} with peak temperatures reaching <strong>48.7°C</strong> in Zone A–Ardena. This event is classified as <strong>EXTREME</strong> and poses severe risk to public health and critical infrastructure.</p>
         <div class="rpt-stat-row">
           <div class="rpt-stat-box"><span class="val">48.7°C</span><span class="lbl">Peak Temp</span></div>
           <div class="rpt-stat-box"><span class="val">7</span><span class="lbl">Affected Zones</span></div>
@@ -1099,7 +1100,7 @@ function generateReportPreview() {
       <div class="rpt-section">
         <h2>Field Operations Status</h2>
         <p><strong>Operational Period:</strong> ${from} to ${to} | <strong>AO:</strong> ${regionStr}</p>
-        <p>This report provides field-level intelligence for emergency responders operating within the Helvino heat wave event zone.</p>
+        <p>This report provides field-level intelligence for emergency responders operating within the El Niño heat wave event zone.</p>
       </div>
 
       <div class="rpt-section">
@@ -1147,7 +1148,7 @@ function generateReportPreview() {
     html += `
       <div class="rpt-section">
         <h2>⚠️ Public Safety Advisory</h2>
-        <p><strong>EXTREME HEAT WARNING</strong> in effect for ${regionStr}. Heat Wave Helvino is producing dangerous temperatures. All residents are urged to take immediate precautions.</p>
+        <p><strong>EXTREME HEAT WARNING</strong> in effect for ${regionStr}. Heat Wave El Niño is producing dangerous temperatures. All residents are urged to take immediate precautions.</p>
         <div class="rpt-stat-row">
           <div class="rpt-stat-box"><span class="val">48.7°C</span><span class="lbl">Max Temp Today</span></div>
           <div class="rpt-stat-box"><span class="val">7</span><span class="lbl">Zones Affected</span></div>
@@ -1194,7 +1195,7 @@ function generateReportPreview() {
 
   html += `
     <div class="rpt-footer">
-      HELVINO HEAT WAVE OPERATIONS CENTER &nbsp;|&nbsp; Report generated ${formatDate(now)} &nbsp;|&nbsp; CONFIDENTIAL
+      El Niño HEAT WAVE OPERATIONS CENTER &nbsp;|&nbsp; Report generated ${formatDate(now)} &nbsp;|&nbsp; CONFIDENTIAL
     </div>
   `;
 
@@ -1226,7 +1227,7 @@ function exportPdf() {
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-  doc.text('HELVINO', margin, 12);
+  doc.text('El Niño', margin, 12);
   doc.setFontSize(11);
   const titles = { executive: 'Executive Summary Report', field: 'Field Operations Report', public: 'Public Information Bulletin' };
   doc.text(titles[APP.reportType] || 'Heat Wave Report', margin, 20);
@@ -1234,7 +1235,7 @@ function exportPdf() {
   // Meta
   doc.setFontSize(9);
   const now = new Date();
-  doc.text(`Generated: ${formatDate(now)}  |  Prepared by: ${document.getElementById('rptAuthor').value || 'Helvino EOC'}`, margin, 26);
+  doc.text(`Generated: ${formatDate(now)}  |  Prepared by: ${document.getElementById('rptAuthor').value || 'El Niño EOC'}`, margin, 26);
 
   yPos = 36;
   doc.setTextColor(30, 30, 30);
@@ -1368,13 +1369,13 @@ function exportPdf() {
     doc.setFontSize(8);
     doc.setTextColor(150);
     doc.text(
-      `HELVINO HEAT WAVE OPERATIONS CENTER  |  CONFIDENTIAL  |  Page ${p} of ${totalPages}`,
+      `El Niño HEAT WAVE OPERATIONS CENTER  |  CONFIDENTIAL  |  Page ${p} of ${totalPages}`,
       margin, pageH - 8
     );
     doc.line(margin, pageH - 12, pageW - margin, pageH - 12);
   }
 
-  const filename = `Helvino_${titles[APP.reportType].replace(/\s+/g, '_')}_${formatDateISO()}.pdf`;
+  const filename = `El-Nino_${titles[APP.reportType].replace(/\s+/g, '_')}_${formatDateISO()}.pdf`;
   doc.save(filename);
   showToast(`PDF exported: ${filename}`, 'success', '📥');
 }

@@ -1,5 +1,5 @@
-/* ═══════════════════════════════════════════════════════════
-   HELVINO — LIVE DATA INTEGRATION MODULE  v2.0
+﻿/* ═══════════════════════════════════════════════════════════
+   El Niño — LIVE DATA INTEGRATION MODULE  v2.0
    ───────────────────────────────────────────────────────────
    APIs Used:
    ✅ Open-Meteo Forecast  — free, no key, CORS-safe
