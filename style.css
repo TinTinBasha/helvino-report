@@ -2452,3 +2452,322 @@ textarea { resize: vertical; min-height: 80px; }
   .city-weather-grid { grid-template-columns: 1fr; }
 }
 
+
+/* ═══════════════════════════════════════════════════════════
+   TAMIL NADU MODULE
+   ═══════════════════════════════════════════════════════════ */
+
+/* ── TN Sub-Tab Button ──────────────────────────────────── */
+.india-subtab.tn-tab {
+  background: linear-gradient(135deg, rgba(255,153,51,0.12), rgba(19,136,8,0.08));
+  border-color: rgba(255,153,51,0.3);
+  color: #FF9933;
+  position: relative;
+}
+
+.india-subtab.tn-tab::before {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #FF9933, #138808);
+  border-radius: 0 0 4px 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.india-subtab.tn-tab.active,
+.india-subtab.tn-tab:hover {
+  background: linear-gradient(135deg, rgba(255,153,51,0.2), rgba(19,136,8,0.12));
+  color: #FF9933;
+  border-color: rgba(255,153,51,0.5);
+}
+
+.india-subtab.tn-tab.active::before { opacity: 1; }
+
+/* ── TN Header Banner ───────────────────────────────────── */
+.tn-header-banner {
+  background: linear-gradient(135deg, rgba(255,153,51,0.08) 0%, rgba(26,32,53,0.6) 40%, rgba(19,136,8,0.06) 100%);
+  border: 1px solid rgba(255,153,51,0.25);
+  border-left: 4px solid #FF9933;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: relative;
+}
+
+.tn-flag-stripes {
+  display: flex;
+  height: 5px;
+  width: 100%;
+}
+
+.tn-stripe { flex: 1; }
+.tn-saffron { background: #FF9933; }
+.tn-white   { background: #ffffff22; }
+.tn-green   { background: #138808; }
+
+.tn-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tn-title-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tn-state-emblem {
+  font-size: 36px;
+  filter: drop-shadow(0 2px 8px rgba(255,153,51,0.4));
+  flex-shrink: 0;
+}
+
+.tn-state-name {
+  font-size: 22px;
+  font-weight: 800;
+  background: linear-gradient(90deg, #FF9933, #F7A731);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 1px;
+}
+
+.tn-state-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  margin-top: 3px;
+}
+
+.tn-header-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tn-alert-pill {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid;
+  letter-spacing: 0.3px;
+}
+
+.tn-pill-yellow { background: rgba(247,167,49,0.15); color: #FFD166; border-color: rgba(247,167,49,0.35); }
+.tn-pill-teal   { background: rgba(46,196,182,0.12); color: #2EC4B6; border-color: rgba(46,196,182,0.3);  }
+.tn-pill-blue   { background: rgba(76,201,240,0.12); color: #4CC9F0; border-color: rgba(76,201,240,0.3);  }
+
+.tn-update-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── TN Main Layout (Map + Table) ───────────────────────── */
+.tn-main-layout {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* ── TN Map ─────────────────────────────────────────────── */
+.tn-map {
+  height: 380px;
+  border-radius: var(--radius-md);
+  background: #0d1117;
+  position: relative;
+  z-index: 0;
+}
+
+.tn-map-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--bg-border);
+}
+
+.tn-leg-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.tn-leg-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── TN District Table ──────────────────────────────────── */
+.tn-district-table thead { position: sticky; top: 0; z-index: 2; }
+
+.tn-district-table tr { cursor: pointer; }
+
+.tn-district-table tr:hover td {
+  background: rgba(255,153,51,0.06);
+}
+
+.tn-district-table tr.selected td {
+  background: rgba(255,153,51,0.1);
+}
+
+/* ── TN AQI Grid ────────────────────────────────────────── */
+.tn-aqi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
+}
+
+.aqi-card {
+  background: var(--bg-input);
+  border: 1px solid var(--bg-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--trans-fast);
+}
+
+.aqi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.aqi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+
+.aqi-card-city   { font-size: 13px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px; }
+.aqi-card-state  { font-size: 10px; color: var(--text-muted); margin-bottom: 10px; }
+.aqi-card-value  { font-size: 36px; font-weight: 900; line-height: 1; margin-bottom: 4px; }
+.aqi-card-label  { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; }
+.aqi-card-stats  { display: flex; flex-wrap: wrap; gap: 5px; }
+.aqi-card-stat   { font-size: 10px; color: var(--text-secondary); background: var(--bg-border); padding: 2px 7px; border-radius: 999px; }
+.aqi-card-source { font-size: 9px; color: var(--text-muted); margin-top: 8px; }
+
+/* AQI Level Colours */
+.aqi-good          { color: #26de81; } .aqi-good::before          { background: #26de81; }
+.aqi-fair          { color: #A3CB38; } .aqi-fair::before          { background: #A3CB38; }
+.aqi-moderate      { color: #F7A731; } .aqi-moderate::before      { background: #F7A731; }
+.aqi-poor          { color: #FF6B35; } .aqi-poor::before          { background: #FF6B35; }
+.aqi-very-poor     { color: #D62839; } .aqi-very-poor::before     { background: #D62839; }
+.aqi-extremely-poor{ color: #7B2FBE; } .aqi-extremely-poor::before{ background: #7B2FBE; }
+
+/* ── Reference Badge ────────────────────────────────────── */
+.tn-ref-badge {
+  background: rgba(247,167,49,0.12) !important;
+  color: #F7A731 !important;
+  border-color: rgba(247,167,49,0.3) !important;
+}
+
+/* ── TN Data Note ───────────────────────────────────────── */
+.tn-data-note {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(247,167,49,0.06);
+  border-left: 3px solid rgba(247,167,49,0.4);
+  border-radius: 0 4px 4px 0;
+}
+
+/* ── TN Advisories List ─────────────────────────────────── */
+.tn-advisories-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tn-advisory-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-input);
+  border-radius: var(--radius-md);
+  border-left: 3px solid;
+  align-items: flex-start;
+}
+
+.tn-adv-icon { font-size: 22px; flex-shrink: 0; }
+.tn-adv-body { flex: 1; }
+.tn-adv-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 3px; }
+.tn-adv-desc  { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.tn-adv-meta  { font-size: 10px; color: var(--text-muted); margin-top: 5px; }
+.tn-adv-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+
+/* ── TN IMD Stations ────────────────────────────────────── */
+.tn-imd-stations { display: flex; flex-direction: column; gap: 6px; }
+
+.tn-imd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--bg-input);
+  border-radius: var(--radius-sm);
+  gap: 8px;
+}
+
+.tn-imd-station { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.tn-imd-temp    { font-size: 18px; font-weight: 800; }
+.tn-imd-detail  { font-size: 10px; color: var(--text-muted); }
+.tn-imd-alert   { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+
+/* ── TN Sources Note ────────────────────────────────────── */
+.tn-sources-note {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: rgba(76,201,240,0.06);
+  border: 1px solid rgba(76,201,240,0.18);
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ── Leaflet popup TN override ──────────────────────────── */
+.tn-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-border);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+.tn-popup .leaflet-popup-tip { background: var(--bg-card); }
+
+/* ── Responsive Tamil Nadu ──────────────────────────────── */
+@media (max-width: 1024px) {
+  .tn-main-layout { grid-template-columns: 1fr; }
+  .tn-map { height: 300px; }
+}
+
+@media (max-width: 768px) {
+  .tn-header-content { flex-direction: column; align-items: flex-start; }
+  .tn-state-name { font-size: 18px; }
+  .tn-aqi-grid { grid-template-columns: repeat(2, 1fr); }
+  .tn-main-layout { grid-template-columns: 1fr; }
+  .tn-map { height: 260px; }
+  .tn-map-legend { gap: 8px; }
+  .tn-leg-item { font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .tn-aqi-grid { grid-template-columns: 1fr 1fr; }
+  .tn-header-pills { gap: 5px; }
+  .tn-alert-pill { font-size: 10px; padding: 4px 9px; }
+  .tn-state-emblem { font-size: 28px; }
+  .tn-state-name { font-size: 16px; }
+}
+

@@ -1,4 +1,4 @@
-﻿/* ═══════════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    El Niño — LIVE DATA INTEGRATION MODULE  v2.0
    ───────────────────────────────────────────────────────────
    APIs Used:
@@ -747,6 +747,7 @@ function startAutoRefresh() {
 ══════════════════════════════════════════════════════════════ */
 async function initLiveData() {
   renderDataSourcesPanel();
+  renderTNSourcesPanel();
   initApiKeyPanel();
   renderFIRMSInfoPanel();
 
@@ -754,15 +755,729 @@ async function initLiveData() {
   const savedFirms = localStorage.getItem('firms_api_key');
   if (savedFirms) addFIRMSWMSLayer(savedFirms);
 
+  // Wire up TN sort dropdown
+  const tnSortSelect = document.getElementById('tnSortBy');
+  if (tnSortSelect) {
+    tnSortSelect.addEventListener('change', renderTNDistrictTable);
+  }
+
+  // Render TN reference components
+  renderTNReservoirChart();
+  renderTNNDMAAdvisories();
+  renderTNIMDStations();
+
   // Fetch all free APIs in parallel
   await Promise.allSettled([
     fetchOpenMeteo(),
     fetchOpenMeteoArchive(),
     fetchNASAPower(),
     fetchNOAAEnso(),
+    fetchTNDistrictWeather(),
+    fetchTNAirQuality(),
   ]);
 
   startAutoRefresh();
 }
 
 document.addEventListener('DOMContentLoaded', () => setTimeout(initLiveData, 600));
+
+/* ══════════════════════════════════════════════════════════════
+   TAMIL NADU MODULE INTEGRATION
+   ══════════════════════════════════════════════════════════════ */
+
+/* ─── Tamil Nadu District Coordinates ────────────────────── */
+const TN_DISTRICTS = [
+  { name: 'Chennai',          lat: 13.0827, lng: 80.2707 },
+  { name: 'Coimbatore',       lat: 11.0168, lng: 76.9558 },
+  { name: 'Madurai',          lat: 9.9252,  lng: 78.1198 },
+  { name: 'Tiruchirappalli',  lat: 10.7905, lng: 78.7047 },
+  { name: 'Salem',            lat: 11.6643, lng: 78.1460 },
+  { name: 'Tirunelveli',      lat: 8.7139,  lng: 77.7567 },
+  { name: 'Vellore',          lat: 12.9165, lng: 79.1325 },
+  { name: 'Erode',            lat: 11.3410, lng: 77.7172 },
+  { name: 'Thanjavur',        lat: 10.7870, lng: 79.1378 },
+  { name: 'Tiruppur',         lat: 11.1085, lng: 77.3411 },
+  { name: 'Dharmapuri',       lat: 12.1211, lng: 78.1582 },
+  { name: 'Namakkal',         lat: 11.2189, lng: 78.1674 },
+  { name: 'Cuddalore',        lat: 11.7480, lng: 79.7714 },
+  { name: 'Ramanathapuram',   lat: 9.3639,  lng: 78.8395 },
+  { name: 'Kancheepuram',     lat: 12.8387, lng: 79.7016 }
+];
+
+const TN_AQI_CITIES = [
+  { name: 'Chennai',          lat: 13.0827, lng: 80.2707 },
+  { name: 'Coimbatore',       lat: 11.0168, lng: 76.9558 },
+  { name: 'Madurai',          lat: 9.9252,  lng: 78.1198 },
+  { name: 'Tiruchirappalli',  lat: 10.7905, lng: 78.7047 },
+  { name: 'Salem',            lat: 11.6643, lng: 78.1460 }
+];
+
+const TN_RESERVOIRS = [
+  { name: 'Mettur', level: 67 },
+  { name: 'Poondi', level: 71 },
+  { name: 'Chembarambakkam', level: 58 },
+  { name: 'Krishnagiri', level: 82 },
+  { name: 'Sathanur', level: 55 }
+];
+
+const TN_NDMA_ADVISORIES = [
+  { severity: 'Red',    icon: '🔥', title: 'Severe Heat Wave Warning', desc: 'Sustained peak temperatures exceeding 42°C forecast across Salem, Dharmapuri, Erode, and Namakkal. Implement emergency cooling operations.', issued: '2026-06-20' },
+  { severity: 'Orange', icon: '💧', title: 'Coastal Heat Index Alert', desc: 'Combination of high temperatures (39°C) and high humidity forecast for Chennai, Cuddalore, and Kancheepuram. Feels-like temperatures likely to exceed 45°C.', issued: '2026-06-20' },
+  { severity: 'Yellow', icon: '☀️', title: 'South TN Advisory', desc: 'Moderate heat wave conditions active in Madurai, Tirunelveli, and Ramanathapuram. Citizens advised to avoid outdoor exposure between 11:00 AM and 4:00 PM.', issued: '2026-06-19' }
+];
+
+const TN_IMD_STATIONS = [
+  { name: 'Chennai Nungambakkam', condition: 'Partly Cloudy', deviation: '+1.5°', temp: 39.5, alert: 'Orange' },
+  { name: 'Chennai Meenambakkam', condition: 'Mainly Clear',  deviation: '+2.1°', temp: 41.2, alert: 'Orange' },
+  { name: 'Coimbatore Peelamedu', condition: 'Sunny',         deviation: '+1.8°', temp: 38.2, alert: 'Yellow' },
+  { name: 'Madurai Airport',      condition: 'Sunny',         deviation: '+2.9°', temp: 42.1, alert: 'Red' },
+  { name: 'Tiruchirappalli',      condition: 'Clear Sky',     deviation: '+2.3°', temp: 40.8, alert: 'Orange' }
+];
+
+// Initialize Tamil Nadu state storage
+LIVE.selectedTNCity = 'Chennai';
+LIVE.tnWeather = {};
+LIVE.tnForecast = {};
+LIVE.tnAQI = {};
+LIVE.status.tnDistricts = 'pending';
+LIVE.status.tnAQI = 'pending';
+
+// Override updateSourceStatus to handle both panels
+const originalUpdateSourceStatus = updateSourceStatus;
+updateSourceStatus = function(source, status) {
+  if (typeof originalUpdateSourceStatus === 'function') {
+    originalUpdateSourceStatus(source, status);
+  } else {
+    LIVE.status[source] = status;
+    renderDataSourcesPanel();
+  }
+  renderTNSourcesPanel();
+};
+
+/* ─── Fetch functions ─────────────────────────────────────── */
+async function fetchTNDistrictWeather() {
+  updateSourceStatus('tnDistricts', 'loading');
+  const lats = TN_DISTRICTS.map(c => c.lat).join(',');
+  const lons = TN_DISTRICTS.map(c => c.lng).join(',');
+
+  const url =
+    `https://api.open-meteo.com/v1/forecast` +
+    `?latitude=${lats}&longitude=${lons}` +
+    `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,` +
+    `apparent_temperature,weather_code,precipitation` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,` +
+    `wind_speed_10m_max,apparent_temperature_max` +
+    `&timezone=Asia%2FKolkata&forecast_days=7`;
+
+  const data = await safeFetch(url, 'Open-Meteo TN Districts');
+  if (!data) {
+    updateSourceStatus('tnDistricts', 'error');
+    return;
+  }
+
+  const results = Array.isArray(data) ? data : [data];
+  let ok = 0;
+  results.forEach((r, i) => {
+    if (!r?.current) return;
+    const city = TN_DISTRICTS[i];
+    LIVE.tnWeather[city.name] = {
+      temp:      r.current.temperature_2m,
+      humidity:  r.current.relative_humidity_2m,
+      windSpeed: r.current.wind_speed_10m,
+      feelsLike: r.current.apparent_temperature,
+      precip:    r.current.precipitation ?? 0,
+      code:      r.current.weather_code ?? 0,
+      time:      r.current.time,
+    };
+    if (r.daily) {
+      LIVE.tnForecast[city.name] = {
+        dates:    r.daily.time,
+        maxTemp:  r.daily.temperature_2m_max,
+        minTemp:  r.daily.temperature_2m_min,
+        feelsMax: r.daily.apparent_temperature_max,
+        precip:   r.daily.precipitation_sum,
+        wind:     r.daily.wind_speed_10m_max,
+      };
+    }
+    ok++;
+  });
+
+  updateSourceStatus('tnDistricts', ok > 0 ? 'ok' : 'error');
+  renderTNDashboard();
+  renderTNDistrictTable();
+  renderTNMapMarkers();
+  
+  if (LIVE.selectedTNCity && LIVE.tnForecast[LIVE.selectedTNCity]) {
+    renderTNForecastChart(LIVE.selectedTNCity);
+  } else {
+    LIVE.selectedTNCity = 'Chennai';
+    renderTNForecastChart('Chennai');
+  }
+}
+
+async function fetchTNAirQuality() {
+  updateSourceStatus('tnAQI', 'loading');
+  const lats = TN_AQI_CITIES.map(c => c.lat).join(',');
+  const lons = TN_AQI_CITIES.map(c => c.lng).join(',');
+
+  const url =
+    `https://air-quality-api.open-meteo.com/v1/air-quality` +
+    `?latitude=${lats}&longitude=${lons}` +
+    `&current=european_aqi,pm2_5,pm10,nitrogen_dioxide,ozone` +
+    `&timezone=Asia%2FKolkata`;
+
+  const data = await safeFetch(url, 'Open-Meteo TN AQI');
+  if (!data) {
+    updateSourceStatus('tnAQI', 'error');
+    return;
+  }
+
+  const results = Array.isArray(data) ? data : [data];
+  let ok = 0;
+  results.forEach((r, i) => {
+    if (!r?.current) return;
+    const city = TN_AQI_CITIES[i];
+    LIVE.tnAQI[city.name] = {
+      aqi: r.current.european_aqi,
+      pm2_5: r.current.pm2_5,
+      pm10: r.current.pm10,
+      no2: r.current.nitrogen_dioxide,
+      o3: r.current.ozone,
+    };
+    ok++;
+  });
+
+  updateSourceStatus('tnAQI', ok > 0 ? 'ok' : 'error');
+  renderTNAQIPanel();
+  renderTNDashboard();
+}
+
+/* ─── Helper functions ────────────────────────────────────── */
+function getEuropeanAQIInfo(val) {
+  if (val <= 20) return { label: 'Good', cls: 'aqi-good' };
+  if (val <= 40) return { label: 'Fair', cls: 'aqi-fair' };
+  if (val <= 60) return { label: 'Moderate', cls: 'aqi-moderate' };
+  if (val <= 80) return { label: 'Poor', cls: 'aqi-poor' };
+  if (val <= 100) return { label: 'Very Poor', cls: 'aqi-very-poor' };
+  return { label: 'Extremely Poor', cls: 'aqi-extremely-poor' };
+}
+
+function getTNAlertBadge(temp) {
+  if (temp >= 42) return `<span class="tn-adv-badge" style="background:rgba(214,40,57,0.2);color:#FF4757">🔴 RED</span>`;
+  if (temp >= 38) return `<span class="tn-adv-badge" style="background:rgba(255,107,53,0.2);color:#FF9F43">🟠 ORG</span>`;
+  if (temp >= 34) return `<span class="tn-adv-badge" style="background:rgba(247,167,49,0.2);color:#FECA57">🟡 YEL</span>`;
+  return `<span class="tn-adv-badge" style="background:rgba(46,196,182,0.2);color:#26de81">🟢 NOR</span>`;
+}
+
+/* ─── Render functions ────────────────────────────────────── */
+function renderTNDashboard() {
+  if (!LIVE.tnWeather) return;
+
+  let peakTemp = -999;
+  let peakCity = '';
+  let totalRain = 0;
+  let totalHum = 0;
+  let count = 0;
+
+  TN_DISTRICTS.forEach(d => {
+    const w = LIVE.tnWeather[d.name];
+    if (w) {
+      if (w.temp > peakTemp) {
+        peakTemp = w.temp;
+        peakCity = d.name;
+      }
+      totalRain += w.precip;
+      totalHum += w.humidity;
+      count++;
+    }
+  });
+
+  if (count > 0) {
+    const maxTempEl = document.getElementById('tnMaxTemp');
+    if (maxTempEl) maxTempEl.textContent = `${peakTemp.toFixed(1)}°C`;
+
+    const maxCityEl = document.getElementById('tnMaxTempCity');
+    if (maxCityEl) maxCityEl.textContent = `Peak in ${peakCity} (Open-Meteo)`;
+
+    const avgRain = totalRain / count;
+    const rainEl = document.getElementById('tnRainfall');
+    if (rainEl) rainEl.textContent = `${avgRain.toFixed(1)} mm`;
+
+    const avgHum = totalHum / count;
+    const humEl = document.getElementById('tnAvgHumidity');
+    if (humEl) humEl.textContent = `${Math.round(avgHum)}%`;
+  }
+
+  if (LIVE.tnAQI && LIVE.tnAQI['Chennai']) {
+    const aqVal = LIVE.tnAQI['Chennai'].aqi;
+    const info = getEuropeanAQIInfo(aqVal);
+
+    const aqiMainEl = document.getElementById('tnAQIMain');
+    if (aqiMainEl) {
+      aqiMainEl.textContent = aqVal;
+      aqiMainEl.className = 'stat-value ' + info.cls;
+    }
+
+    const aqiLevelEl = document.getElementById('tnAQILevel');
+    if (aqiLevelEl) {
+      aqiLevelEl.textContent = `${info.label} AQI`;
+      aqiLevelEl.className = 'stat-sub ' + info.cls;
+    }
+  }
+
+  const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+  const tnLastUpdate = document.getElementById('tnLastUpdate');
+  if (tnLastUpdate) tnLastUpdate.textContent = `⏱ Updated: ${now}`;
+}
+
+function renderTNDistrictTable() {
+  const tbody = document.getElementById('tnDistrictTableBody');
+  if (!tbody) return;
+
+  const sortBy = document.getElementById('tnSortBy')?.value || 'temp';
+
+  const dataList = TN_DISTRICTS.map(d => {
+    const w = LIVE.tnWeather?.[d.name] || {};
+    return {
+      name: d.name,
+      temp: w.temp ?? -999,
+      feelsLike: w.feelsLike ?? -999,
+      humidity: w.humidity ?? 0,
+      windSpeed: w.windSpeed ?? 0,
+      precip: w.precip ?? 0,
+      code: w.code ?? 0,
+    };
+  });
+
+  dataList.sort((a, b) => {
+    if (sortBy === 'temp') return b.temp - a.temp;
+    if (sortBy === 'humidity') return b.humidity - a.humidity;
+    if (sortBy === 'precip') return b.precip - a.precip;
+    if (sortBy === 'wind') return b.windSpeed - a.windSpeed;
+    return 0;
+  });
+
+  tbody.innerHTML = '';
+  dataList.forEach(item => {
+    const tr = document.createElement('tr');
+    tr.dataset.district = item.name;
+    if (LIVE.selectedTNCity === item.name) {
+      tr.classList.add('selected');
+    }
+
+    if (item.temp === -999) {
+      tr.innerHTML = `
+        <td style="font-weight:700">${item.name}</td>
+        <td colspan="6" class="data-loading">Fetching…</td>
+      `;
+    } else {
+      tr.innerHTML = `
+        <td style="font-weight:700;color:var(--text-primary)">${item.name}</td>
+        <td style="font-weight:700;color:${item.temp >= 42 ? '#FF4757' : item.temp >= 38 ? '#FF9F43' : '#F0F4FF'}">${item.temp.toFixed(1)}°C</td>
+        <td>${item.feelsLike.toFixed(1)}°C</td>
+        <td>💧 ${item.humidity}%</td>
+        <td>💨 ${item.windSpeed.toFixed(1)} km/h</td>
+        <td style="color:#2EC4B6">${item.precip.toFixed(1)} mm</td>
+        <td>${getTNAlertBadge(item.temp)}</td>
+      `;
+    }
+
+    tr.addEventListener('click', () => {
+      tbody.querySelectorAll('tr').forEach(r => r.classList.remove('selected'));
+      tr.classList.add('selected');
+      LIVE.selectedTNCity = item.name;
+      renderTNForecastChart(item.name);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+function renderTNForecastChart(districtName) {
+  const titleEl = document.getElementById('tnForecastTitle');
+  if (titleEl) titleEl.textContent = `📈 7-Day Forecast — ${districtName} (Open-Meteo)`;
+
+  const canvas = document.getElementById('tnForecastChart');
+  if (!canvas) return;
+
+  if (window._tnForecastChartInst) {
+    window._tnForecastChartInst.destroy();
+    window._tnForecastChartInst = null;
+  }
+
+  const fc = LIVE.tnForecast?.[districtName];
+  if (!fc) return;
+
+  const labels = fc.dates.map(d => {
+    const dt = new Date(d + 'T00:00:00');
+    return dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+  });
+
+  window._tnForecastChartInst = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Max Temp (°C)',
+          data: fc.maxTemp,
+          backgroundColor: 'rgba(255,153,51,0.85)',
+          borderRadius: 5,
+          borderSkipped: false,
+          order: 2,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Min Temp (°C)',
+          data: fc.minTemp,
+          backgroundColor: 'rgba(76,201,240,0.45)',
+          borderRadius: 5,
+          borderSkipped: false,
+          order: 2,
+          yAxisID: 'y',
+        },
+        {
+          label: 'Precipitation (mm)',
+          data: fc.precip,
+          type: 'line',
+          borderColor: '#138808',
+          backgroundColor: 'rgba(19,136,8,0.1)',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#138808',
+          tension: 0.4,
+          fill: true,
+          order: 1,
+          yAxisID: 'y2',
+        },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+          labels: { boxWidth: 12, font: { size: 11 }, color: '#8A9BB8' }
+        },
+        tooltip: {
+          backgroundColor: '#161C2B',
+          borderColor: '#242D42',
+          borderWidth: 1,
+          callbacks: {
+            afterBody: (items) => {
+              const i = items[0]?.dataIndex;
+              if (i === undefined) return [];
+              const fl = fc.feelsMax?.[i];
+              const wn = fc.wind?.[i];
+              return [
+                fl != null ? `Feels Like Max: ${fl.toFixed(1)}°C` : '',
+                wn != null ? `Max Wind: ${wn.toFixed(1)} km/h` : '',
+              ].filter(Boolean);
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(36,45,66,0.6)' }, ticks: { color: '#4E5E7A', font: { size: 10 } } },
+        y: {
+          grid: { color: 'rgba(36,45,66,0.6)' },
+          ticks: { color: '#FF9933', callback: v => v + '°C', font: { size: 10 } },
+          position: 'left',
+          title: { display: true, text: 'Temperature (°C)', color: '#FF9933', font: { size: 10 } }
+        },
+        y2: {
+          grid: { drawOnChartArea: false },
+          ticks: { color: '#138808', callback: v => v + 'mm', font: { size: 10 } },
+          position: 'right',
+          min: 0,
+          title: { display: true, text: 'Precip (mm)', color: '#138808', font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function renderTNReservoirChart() {
+  const canvas = document.getElementById('tnReservoirChart');
+  if (!canvas) return;
+
+  if (window._tnReservoirChartInst) {
+    window._tnReservoirChartInst.destroy();
+    window._tnReservoirChartInst = null;
+  }
+
+  const names = TN_RESERVOIRS.map(r => r.name);
+  const levels = TN_RESERVOIRS.map(r => r.level);
+
+  window._tnReservoirChartInst = new Chart(canvas.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        label: 'Storage level (%)',
+        data: levels,
+        backgroundColor: levels.map(v => v >= 75 ? 'rgba(46,196,182,0.8)' : v >= 50 ? 'rgba(76,201,240,0.8)' : 'rgba(255,107,53,0.8)'),
+        borderColor: levels.map(v => v >= 75 ? '#2EC4B6' : v >= 50 ? '#4CC9F0' : '#FF6B35'),
+        borderWidth: 1.5,
+        borderRadius: 4
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161C2B',
+          borderColor: '#242D42',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` Storage: ${ctx.parsed.x}% of capacity`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(36,45,66,0.6)' },
+          ticks: { color: '#4E5E7A', callback: v => v + '%', font: { size: 10 } },
+          min: 0,
+          max: 100
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: '#8A9BB8', font: { size: 11 } }
+        }
+      }
+    }
+  });
+}
+
+function renderTNAQIPanel() {
+  const panel = document.getElementById('tnAQIPanel');
+  if (!panel) return;
+
+  if (!LIVE.tnAQI || Object.keys(LIVE.tnAQI).length === 0) {
+    panel.innerHTML = `<div class="data-loading">🌬️ Fetching air quality data…</div>`;
+    return;
+  }
+
+  panel.innerHTML = '';
+  TN_AQI_CITIES.forEach(city => {
+    const data = LIVE.tnAQI[city.name];
+    if (!data) return;
+
+    const info = getEuropeanAQIInfo(data.aqi);
+    const card = document.createElement('div');
+    card.className = `aqi-card ${info.cls}`;
+
+    card.innerHTML = `
+      <div class="aqi-card-city">${city.name}</div>
+      <div class="aqi-card-state">Tamil Nadu · European AQI</div>
+      <div class="aqi-card-value">${data.aqi}</div>
+      <div class="aqi-card-label">${info.label}</div>
+      <div class="aqi-card-stats">
+        <span class="aqi-card-stat">PM2.5: ${data.pm2_5.toFixed(1)} µg/m³</span>
+        <span class="aqi-card-stat">PM10: ${data.pm10.toFixed(1)} µg/m³</span>
+        <span class="aqi-card-stat">NO₂: ${data.no2.toFixed(1)} µg/m³</span>
+        <span class="aqi-card-stat">O₃: ${data.o3.toFixed(1)} µg/m³</span>
+      </div>
+      <div class="aqi-card-source">📡 Source: Open-Meteo Air Quality</div>
+    `;
+
+    panel.appendChild(card);
+  });
+}
+
+function renderTNNDMAAdvisories() {
+  const container = document.getElementById('tnAdvisoriesList');
+  if (!container) return;
+
+  container.innerHTML = TN_NDMA_ADVISORIES.map(adv => {
+    let borderCol = '#2EC4B6';
+    let textCol = '#26de81';
+    let bgCol = 'rgba(46,196,182,0.1)';
+    if (adv.severity === 'Red') {
+      borderCol = '#D62839';
+      textCol = '#FF4757';
+      bgCol = 'rgba(214,40,57,0.12)';
+    } else if (adv.severity === 'Orange') {
+      borderCol = '#FF6B35';
+      textCol = '#FF9F43';
+      bgCol = 'rgba(255,107,53,0.12)';
+    } else if (adv.severity === 'Yellow') {
+      borderCol = '#F7A731';
+      textCol = '#FECA57';
+      bgCol = 'rgba(247,167,49,0.12)';
+    }
+
+    return `
+      <div class="tn-advisory-item" style="border-left-color:${borderCol};background:${bgCol}">
+        <div class="tn-adv-icon">${adv.icon}</div>
+        <div class="tn-adv-body">
+          <div class="tn-adv-title">${adv.title}</div>
+          <div class="tn-adv-desc">${adv.desc}</div>
+          <div class="tn-adv-meta">Issued: ${adv.issued} · Source: NDMA Operations Center</div>
+        </div>
+        <span class="tn-adv-badge" style="background:${borderCol}25;color:${textCol};border:1px solid ${borderCol}40">${adv.severity.toUpperCase()} ALERT</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTNIMDStations() {
+  const container = document.getElementById('tnIMDStations');
+  if (!container) return;
+
+  container.innerHTML = TN_IMD_STATIONS.map(st => {
+    let alertBg = 'rgba(46,196,182,0.15)';
+    let alertColor = '#2EC4B6';
+    if (st.alert === 'Red') {
+      alertBg = 'rgba(214,40,57,0.15)';
+      alertColor = '#FF4757';
+    } else if (st.alert === 'Orange') {
+      alertBg = 'rgba(255,107,53,0.15)';
+      alertColor = '#FF9F43';
+    } else if (st.alert === 'Yellow') {
+      alertBg = 'rgba(247,167,49,0.15)';
+      alertColor = '#FECA57';
+    }
+
+    return `
+      <div class="tn-imd-row">
+        <div>
+          <div class="tn-imd-station">${st.name}</div>
+          <div class="tn-imd-detail">${st.condition} · Dev: <strong style="color:${alertColor}">${st.deviation}</strong></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="tn-imd-temp" style="color:${alertColor}">${st.temp.toFixed(1)}°C</div>
+          <span class="tn-imd-alert" style="background:${alertBg};color:${alertColor};border:1px solid ${alertColor}30">${st.alert}</span>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTNSourcesPanel() {
+  const container = document.getElementById('tnSourcesPanel');
+  if (!container) return;
+
+  const SOURCES = [
+    { key: 'tnDistricts', label: 'Open-Meteo Forecast (Districts)', emoji: '🌤️', note: 'api.open-meteo.com · 15 TN districts · Live ✅', status: LIVE.status.tnDistricts || 'pending' },
+    { key: 'tnAQI',       label: 'Open-Meteo Air Quality',          emoji: '🌬️', note: 'air-quality-api.open-meteo.com · Live ✅', status: LIVE.status.tnAQI || 'pending' },
+    { key: 'tnReservoirs',label: 'WRD Tamil Nadu (Reservoirs)',      emoji: '🏞️', note: 'wrd.tn.gov.in · Reference data ⚠️',        status: 'estimated' },
+    { key: 'tnIMD',       label: 'IMD Chennai (Station Reports)',    emoji: '🌡️', note: 'mausam.imd.gov.in · Reference data ⚠️',   status: 'estimated' },
+    { key: 'tnNDMA',      label: 'NDMA India (Advisories)',          emoji: '🛡️', note: 'ndma.gov.in · Reference data ⚠️',          status: 'estimated' },
+  ];
+
+  const STATUS_CFG = {
+    pending:   { dot:'#4E5E7A', badge:'Pending',    bg:'rgba(78,94,122,0.15)'   },
+    loading:   { dot:'#F7A731', badge:'Loading…',   bg:'rgba(247,167,49,0.15)'  },
+    ok:        { dot:'#2EC4B6', badge:'Live ✅',    bg:'rgba(46,196,182,0.15)'  },
+    error:     { dot:'#D62839', badge:'Error ❌',   bg:'rgba(214,40,57,0.12)'   },
+    estimated: { dot:'#F7A731', badge:'Reference ⚠️',bg:'rgba(247,167,49,0.12)' },
+  };
+
+  container.innerHTML = SOURCES.map(s => {
+    const cfg = STATUS_CFG[s.status] || STATUS_CFG.pending;
+    return `
+      <div class="datasource-row">
+        <div class="ds-icon">${s.emoji}</div>
+        <div class="ds-info">
+          <div class="ds-label">${s.label}</div>
+          <div class="ds-note">${s.note}</div>
+        </div>
+        <div class="ds-badge" style="background:${cfg.bg};color:${cfg.dot};border:1px solid ${cfg.dot}30">
+          <span class="ds-dot" style="background:${cfg.dot}"></span>${cfg.badge}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function initTNMap() {
+  if (!window.APP) window.APP = {};
+  if (window.APP.tnMap) return;
+
+  const mapContainer = document.getElementById('tnMap');
+  if (!mapContainer) return;
+
+  window.APP.tnMap = L.map('tnMap', {
+    center: [10.7, 78.8],
+    zoom: 7,
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    subdomains: 'abcd',
+    maxZoom: 10
+  }).addTo(window.APP.tnMap);
+
+  renderTNMapMarkers();
+}
+
+function renderTNMapMarkers() {
+  if (!window.APP.tnMap) return;
+
+  if (window.APP.tnMarkers) {
+    window.APP.tnMarkers.forEach(m => window.APP.tnMap.removeLayer(m));
+  }
+  window.APP.tnMarkers = [];
+
+  const ALERT_COLORS = {
+    extreme: '#D62839',
+    high:    '#FF6B35',
+    moderate:'#F7A731',
+    normal:  '#2EC4B6'
+  };
+
+  TN_DISTRICTS.forEach(d => {
+    const w = LIVE.tnWeather?.[d.name];
+    let tempStr = '—°C';
+    let humidityStr = '💧 —%';
+    let feelsStr = '—';
+    let markerColor = '#4E5E7A';
+    let size = 20000;
+
+    if (w) {
+      tempStr = `${w.temp.toFixed(1)}°C`;
+      humidityStr = `💧 ${w.humidity}%`;
+      feelsStr = `Feels like ${w.feelsLike.toFixed(1)}°C`;
+      const lvl = w.temp >= 42 ? 'extreme' : w.temp >= 38 ? 'high' : w.temp >= 34 ? 'moderate' : 'normal';
+      markerColor = ALERT_COLORS[lvl];
+      size = w.temp >= 42 ? 28000 : w.temp >= 38 ? 24000 : 20000;
+    }
+
+    const circle = L.circle([d.lat, d.lng], {
+      radius: size,
+      color: markerColor,
+      fillColor: markerColor,
+      fillOpacity: 0.35,
+      weight: w?.temp >= 42 ? 2 : 1
+    });
+
+    circle.bindPopup(`
+      <div class="map-popup">
+        <h4 style="margin:0 0 6px 0;color:var(--text-primary);border-bottom:1px solid var(--bg-border);padding-bottom:4px">${d.name}</h4>
+        <div class="pop-row"><span class="pop-label">Temperature</span><span class="pop-val" style="color:${markerColor};font-weight:800">${tempStr}</span></div>
+        <div class="pop-row"><span class="pop-label">Feels Like</span><span class="pop-val">${feelsStr}</span></div>
+        <div class="pop-row"><span class="pop-label">Humidity</span><span class="pop-val">${humidityStr}</span></div>
+        <div class="pop-row"><span class="pop-label">Wind Speed</span><span class="pop-val">💨 ${w ? w.windSpeed.toFixed(1) : '—'} km/h</span></div>
+        <div class="pop-row"><span class="pop-label">Rainfall</span><span class="pop-val">🌧️ ${w ? w.precip.toFixed(1) : '—'} mm</span></div>
+      </div>
+    `, { maxWidth: 220, className: 'tn-popup' });
+
+    circle.addTo(window.APP.tnMap);
+    window.APP.tnMarkers.push(circle);
+
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="background:rgba(10,13,18,0.85);color:#F0F4FF;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:700;font-family:Inter,sans-serif;white-space:nowrap;border:1px solid ${markerColor};pointer-events:none">${d.name} <span style="color:${markerColor}">${tempStr}</span></div>`,
+      iconAnchor: [35, 8]
+    });
+    const marker = L.marker([d.lat, d.lng], { icon, interactive: false }).addTo(window.APP.tnMap);
+    window.APP.tnMarkers.push(marker);
+  });
+}

@@ -1425,6 +1425,12 @@ function initIndiaModule() {
       if (btn.dataset.subtab === 'districts' && !APP.charts.districtTemp) initDistrictTempChart();
       if (btn.dataset.subtab === 'health' && !APP.charts.healthImpact) { initHealthImpactChart(); initFatalityTrendChart(); }
       if (btn.dataset.subtab === 'history' && !APP.charts.indiaHistorical) initIndiaHistoricalChart();
+      if (btn.dataset.subtab === 'tamilnadu') {
+        if (!APP._tnMapInitialized && window.initTNMap) {
+          initTNMap();
+          APP._tnMapInitialized = true;
+        }
+      }
 
       // Live data refresh button
       if (btn.dataset.subtab === 'livedata') {
@@ -1438,6 +1444,8 @@ function initIndiaModule() {
             if (window.fetchOpenMeteoArchive) await fetchOpenMeteoArchive();
             if (window.fetchNASAPower) await fetchNASAPower();
             if (window.fetchNOAAEnso) await fetchNOAAEnso();
+            if (window.fetchTNDistrictWeather) await fetchTNDistrictWeather();
+            if (window.fetchTNAirQuality) await fetchTNAirQuality();
             refreshBtn.textContent = '🔄 Refresh';
             refreshBtn.disabled = false;
             showToast('Live data refreshed!', 'success', '🌐');

@@ -567,6 +567,7 @@
         <button class="india-subtab" data-subtab="districts" id="ist-districts">🔥 District Hotspots</button>
         <button class="india-subtab" data-subtab="health" id="ist-health">🏥 Health Impact</button>
         <button class="india-subtab" data-subtab="history" id="ist-history">📅 Historical Events</button>
+        <button class="india-subtab tn-tab" data-subtab="tamilnadu" id="ist-tamilnadu">🏛️ Tamil Nadu</button>
         <button class="india-subtab live-tab" data-subtab="livedata" id="ist-livedata">🌐 Live Data Feed</button>
       </div>
 
@@ -797,6 +798,200 @@
         </div>
 
         <div class="historical-timeline" id="historicalTimeline"></div>
+      </div>
+
+      <!-- ── SUB-TAB: TAMIL NADU ── -->
+      <div class="india-sub" id="isub-tamilnadu">
+
+        <!-- TN State Header Banner -->
+        <div class="tn-header-banner">
+          <div class="tn-flag-stripes">
+            <div class="tn-stripe tn-saffron"></div>
+            <div class="tn-stripe tn-white"></div>
+            <div class="tn-stripe tn-green"></div>
+          </div>
+          <div class="tn-header-content">
+            <div class="tn-title-group">
+              <div class="tn-state-emblem">🏛️</div>
+              <div>
+                <div class="tn-state-name">Tamil Nadu</div>
+                <div class="tn-state-sub">Live Weather · Climate Intelligence · Multi-Source Monitoring</div>
+              </div>
+            </div>
+            <div class="tn-header-pills">
+              <span class="tn-alert-pill tn-pill-yellow">🟡 IMD Yellow Alert</span>
+              <span class="tn-alert-pill tn-pill-teal">🛡️ NDMA Active</span>
+              <span class="tn-alert-pill tn-pill-blue">🌐 Open-Meteo Live</span>
+              <span class="tn-update-time" id="tnLastUpdate">⏱ Fetching…</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card heat">
+            <div class="stat-icon">🌡️</div>
+            <div class="stat-body">
+              <div class="stat-value" id="tnMaxTemp">—°C</div>
+              <div class="stat-label">Peak Temp (TN)</div>
+              <div class="stat-sub" id="tnMaxTempCity">Live — Open-Meteo</div>
+            </div>
+          </div>
+          <div class="stat-card warning">
+            <div class="stat-icon">🌧️</div>
+            <div class="stat-body">
+              <div class="stat-value" id="tnRainfall">—mm</div>
+              <div class="stat-label">Today's Rainfall</div>
+              <div class="stat-sub">State average (Open-Meteo)</div>
+            </div>
+          </div>
+          <div class="stat-card danger">
+            <div class="stat-icon">🚨</div>
+            <div class="stat-body">
+              <div class="stat-value">3</div>
+              <div class="stat-label">Active NDMA Alerts</div>
+              <div class="stat-sub">Heat wave + Cyclone watch</div>
+            </div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">🏞️</div>
+            <div class="stat-body">
+              <div class="stat-value">65%</div>
+              <div class="stat-label">Reservoir Level (Avg)</div>
+              <div class="stat-sub">WRD TN reference data</div>
+            </div>
+          </div>
+          <div class="stat-card purple">
+            <div class="stat-icon">🌬️</div>
+            <div class="stat-body">
+              <div class="stat-value" id="tnAQIMain">—</div>
+              <div class="stat-label">AQI — Chennai</div>
+              <div class="stat-sub" id="tnAQILevel">Loading…</div>
+            </div>
+          </div>
+          <div class="stat-card safe">
+            <div class="stat-icon">💧</div>
+            <div class="stat-body">
+              <div class="stat-value" id="tnAvgHumidity">—%</div>
+              <div class="stat-label">Avg Humidity</div>
+              <div class="stat-sub">Across 15 districts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Map + District Table -->
+        <div class="tn-main-layout">
+          <!-- TN Leaflet Map -->
+          <div class="card">
+            <div class="card-header">
+              <h3>🗺️ Tamil Nadu District Weather Map</h3>
+              <span class="card-badge">Open-Meteo · Live</span>
+            </div>
+            <div id="tnMap" class="tn-map"></div>
+            <div class="tn-map-legend">
+              <span class="tn-leg-item"><span class="tn-leg-dot" style="background:#D62839"></span>Extreme ≥42°C</span>
+              <span class="tn-leg-item"><span class="tn-leg-dot" style="background:#FF6B35"></span>High 38–41°C</span>
+              <span class="tn-leg-item"><span class="tn-leg-dot" style="background:#F7A731"></span>Moderate 34–37°C</span>
+              <span class="tn-leg-item"><span class="tn-leg-dot" style="background:#2EC4B6"></span>Normal &lt;34°C</span>
+            </div>
+          </div>
+          <!-- District Table -->
+          <div class="card">
+            <div class="card-header">
+              <h3>📋 District Conditions</h3>
+              <select id="tnSortBy" class="small-select">
+                <option value="temp">Sort: Temp ↓</option>
+                <option value="humidity">Sort: Humidity ↓</option>
+                <option value="precip">Sort: Rain ↓</option>
+                <option value="wind">Sort: Wind ↓</option>
+              </select>
+            </div>
+            <div class="risk-table-wrap">
+              <table class="risk-table tn-district-table">
+                <thead>
+                  <tr>
+                    <th>District</th>
+                    <th>Temp</th>
+                    <th>Feels Like</th>
+                    <th>Humidity</th>
+                    <th>Wind</th>
+                    <th>Rain</th>
+                    <th>Alert</th>
+                  </tr>
+                </thead>
+                <tbody id="tnDistrictTableBody">
+                  <tr><td colspan="7" class="data-loading">🌐 Fetching district data…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7-Day Forecast + Reservoir Chart -->
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header">
+              <h3 id="tnForecastTitle">📈 7-Day Forecast — Click a District</h3>
+              <span class="card-badge">Open-Meteo WMO Standard</span>
+            </div>
+            <div class="chart-wrap" style="height:260px">
+              <canvas id="tnForecastChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>🏞️ Reservoir Storage Levels</h3>
+              <span class="card-badge tn-ref-badge">WRD TN · Reference</span>
+            </div>
+            <div class="chart-wrap" style="height:230px">
+              <canvas id="tnReservoirChart"></canvas>
+            </div>
+            <div class="tn-data-note">⚠️ Reference data — wrd.tn.gov.in is CORS-blocked for direct browser fetch. Values from latest published reports.</div>
+          </div>
+        </div>
+
+        <!-- AQI Panel -->
+        <div class="card">
+          <div class="card-header">
+            <h3>🌬️ Air Quality Index — Tamil Nadu Cities</h3>
+            <span class="card-badge">Open-Meteo Air Quality API · Live</span>
+          </div>
+          <div id="tnAQIPanel" class="tn-aqi-grid">
+            <div class="data-loading">🌬️ Fetching air quality data…</div>
+          </div>
+        </div>
+
+        <!-- NDMA Advisories + IMD Stations -->
+        <div class="charts-row">
+          <div class="card chart-card wide">
+            <div class="card-header">
+              <h3>🛡️ NDMA Active Advisories — Tamil Nadu</h3>
+              <span class="card-badge tn-ref-badge">NDMA · Reference</span>
+            </div>
+            <div class="tn-advisories-list" id="tnAdvisoriesList">
+              <div class="data-loading">Loading advisories…</div>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <div class="card-header">
+              <h3>🌡️ IMD Station Reports</h3>
+              <span class="card-badge tn-ref-badge">IMD Chennai · Reference</span>
+            </div>
+            <div class="tn-imd-stations" id="tnIMDStations">
+              <div class="data-loading">Loading IMD data…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Sources Panel -->
+        <div class="card">
+          <div class="card-header"><h3>📡 Tamil Nadu Data Sources</h3><span class="card-badge">Coverage Summary</span></div>
+          <div class="datasources-grid" id="tnSourcesPanel"></div>
+          <div class="tn-sources-note">
+            <strong>🔒 Browser CORS Limitation:</strong> Some government portals (IMD mausam.imd.gov.in, WRD TN wrd.tn.gov.in, CPCB app.cpcbccr.com, NDMA ndma.gov.in) do not send CORS headers — they cannot be fetched directly from browser JavaScript. Data from those sources is shown as curated reference values with ⚠️ badges. For fully live government feeds, a backend Node.js proxy is required.
+          </div>
+        </div>
+
       </div>
 
       <!-- ── SUB-TAB: LIVE DATA FEED ── -->
