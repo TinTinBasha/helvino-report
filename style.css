@@ -2763,6 +2763,7 @@ textarea { resize: vertical; min-height: 80px; }
   .tn-leg-item { font-size: 10px; }
 }
 
+
 @media (max-width: 480px) {
   .tn-aqi-grid { grid-template-columns: 1fr 1fr; }
   .tn-header-pills { gap: 5px; }
@@ -2770,4 +2771,192 @@ textarea { resize: vertical; min-height: 80px; }
   .tn-state-emblem { font-size: 28px; }
   .tn-state-name { font-size: 16px; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   GLOBAL EXPANSION COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* World Risk Strip */
+.world-risk-strip {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.wrs-item {
+  flex: 1;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--bg-border);
+  gap: 4px;
+  transition: transform 0.15s;
+}
+.wrs-item:hover { transform: translateY(-2px); }
+.wrs-item.extreme  { border-color: rgba(214,40,57,0.5);  background: rgba(214,40,57,0.08); }
+.wrs-item.high     { border-color: rgba(255,107,53,0.5); background: rgba(255,107,53,0.08);}
+.wrs-item.moderate { border-color: rgba(247,167,49,0.5); background: rgba(247,167,49,0.08);}
+.wrs-item.low      { border-color: rgba(46,196,182,0.5); background: rgba(46,196,182,0.08);}
+.wrs-item.total    { border-color: rgba(76,201,240,0.5); background: rgba(76,201,240,0.08);}
+.wrs-count {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+}
+.wrs-item.extreme  .wrs-count { color: #FF4757; }
+.wrs-item.high     .wrs-count { color: #FF6B35; }
+.wrs-item.moderate .wrs-count { color: #F7A731; }
+.wrs-item.low      .wrs-count { color: #2EC4B6; }
+.wrs-item.total    .wrs-count { color: #4CC9F0; }
+.wrs-label { font-size: 11px; color: var(--text-secondary); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; text-align: center; }
+
+/* Global filter bar */
+.global-filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.global-filter-bar .small-select {
+  min-width: 130px;
+}
+
+/* Continent pill filter (on map) */
+.continent-pills {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--bg-border);
+}
+.cp-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  margin-right: 4px;
+}
+.continent-pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--bg-border);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'Inter', sans-serif;
+  white-space: nowrap;
+}
+.continent-pill:hover {
+  border-color: var(--heat-orange);
+  color: var(--heat-orange);
+  background: rgba(255,107,53,0.08);
+}
+.continent-pill.active {
+  background: rgba(255,107,53,0.18);
+  border-color: var(--heat-orange);
+  color: var(--heat-orange);
+  box-shadow: 0 0 10px rgba(255,107,53,0.25);
+}
+
+/* Map fly-to select */
+.map-fly-select {
+  width: 100%;
+  padding: 8px 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--bg-border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+.map-fly-select:focus {
+  outline: none;
+  border-color: var(--heat-orange);
+}
+
+/* Report scope selector */
+.scope-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.scope-btn {
+  flex: 1;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--bg-border);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  white-space: nowrap;
+}
+.scope-btn:hover {
+  border-color: var(--heat-orange);
+  color: var(--heat-orange);
+}
+.scope-btn.active {
+  background: rgba(255,107,53,0.15);
+  border-color: var(--heat-orange);
+  color: var(--heat-orange);
+}
+
+/* Make risk table scrollable with wider columns */
+.risk-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.risk-table th,
+.risk-table td {
+  white-space: nowrap;
+  padding: 10px 14px;
+}
+
+/* Incident filter row adjustments */
+.filter-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.filter-row .small-select {
+  min-width: 110px;
+  flex: 1;
+}
+
+/* Shelter region line */
+.shelter-region {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Mobile: world risk strip compact */
+@media (max-width: 600px) {
+  .wrs-count { font-size: 22px; }
+  .wrs-item { min-width: 70px; padding: 10px 6px; }
+  .continent-pills { padding: 8px 12px; gap: 6px; }
+  .continent-pill { padding: 5px 10px; font-size: 11px; }
+  .global-filter-bar { gap: 6px; }
+  .global-filter-bar .small-select { min-width: 100px; }
+  .scope-selector { gap: 6px; }
+  .scope-btn { font-size: 11px; padding: 7px 8px; }
+}
+
+
 

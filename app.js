@@ -17,15 +17,68 @@ const APP = {
 };
 
 // ── Sample El Niño Data ───────────────────────────────────────
-const REGIONS = [
-  { name: 'Zone A – Ardena',    temp: 48.7, humidity: 22, population: '1.2M', risk: 'extreme', lat: 37.5,  lng: 15.1  },
-  { name: 'Zone B – Braxton',   temp: 46.3, humidity: 25, population: '890K', risk: 'extreme', lat: 38.0,  lng: 15.8  },
-  { name: 'Zone C – Cordell',   temp: 44.1, humidity: 28, population: '2.1M', risk: 'high',    lat: 36.8,  lng: 14.5  },
-  { name: 'Zone D – Delvar',    temp: 47.5, humidity: 19, population: '560K', risk: 'extreme', lat: 37.9,  lng: 14.0  },
-  { name: 'Zone E – Elvira',    temp: 41.8, humidity: 33, population: '3.4M', risk: 'high',    lat: 38.5,  lng: 16.2  },
-  { name: 'Zone F – Farentino', temp: 39.2, humidity: 38, population: '780K', risk: 'moderate',lat: 36.2,  lng: 15.5  },
-  { name: 'Zone G – Gorvia',    temp: 37.6, humidity: 42, population: '1.5M', risk: 'moderate',lat: 37.2,  lng: 16.8  },
+// ── World Countries Dataset (50 countries) ─────────────────────────
+const WORLD_COUNTRIES = [
+  // ASIA
+  { name:'India',           flag:'🇮🇳', continent:'Asia',     capital:'New Delhi',    lat:20.5937, lng:78.9629,  peakTemp:50.5, humidity:18, population:'1.44B', riskLevel:'extreme', alertStatus:'Red',    deaths:312, hosp:18450, shelterCount:4820, incidents:147, heatWaveDays:22 },
+  { name:'Pakistan',        flag:'🇵🇰', continent:'Asia',     capital:'Islamabad',    lat:30.3753, lng:69.3451,  peakTemp:49.8, humidity:14, population:'231M',  riskLevel:'extreme', alertStatus:'Red',    deaths:189, hosp:9820,  shelterCount:1240, incidents:89,  heatWaveDays:19 },
+  { name:'Afghanistan',     flag:'🇦🇫', continent:'Asia',     capital:'Kabul',        lat:33.9391, lng:67.7100,  peakTemp:47.2, humidity:12, population:'40M',   riskLevel:'extreme', alertStatus:'Red',    deaths:189, hosp:3240,  shelterCount:145,  incidents:112, heatWaveDays:22 },
+  { name:'Bangladesh',      flag:'🇧🇩', continent:'Asia',     capital:'Dhaka',        lat:23.6850, lng:90.3563,  peakTemp:43.2, humidity:72, population:'173M',  riskLevel:'high',    alertStatus:'Orange', deaths:67,  hosp:5430,  shelterCount:890,  incidents:54,  heatWaveDays:15 },
+  { name:'Uzbekistan',      flag:'🇺🇿', continent:'Asia',     capital:'Tashkent',     lat:41.3775, lng:64.5853,  peakTemp:44.8, humidity:16, population:'36M',   riskLevel:'high',    alertStatus:'Orange', deaths:67,  hosp:2450,  shelterCount:340,  incidents:45,  heatWaveDays:17 },
+  { name:'Sri Lanka',       flag:'🇱🇰', continent:'Asia',     capital:'Colombo',      lat:7.8731,  lng:80.7718,  peakTemp:38.4, humidity:80, population:'22M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:12,  hosp:780,   shelterCount:145,  incidents:18,  heatWaveDays:9  },
+  { name:'Nepal',           flag:'🇳🇵', continent:'Asia',     capital:'Kathmandu',    lat:28.3949, lng:84.1240,  peakTemp:40.1, humidity:55, population:'29M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:18,  hosp:920,   shelterCount:210,  incidents:22,  heatWaveDays:11 },
+  { name:'China',           flag:'🇨🇳', continent:'Asia',     capital:'Beijing',      lat:35.8617, lng:104.1954, peakTemp:42.3, humidity:38, population:'1.41B', riskLevel:'high',    alertStatus:'Orange', deaths:234, hosp:12450, shelterCount:4320, incidents:112, heatWaveDays:14 },
+  { name:'Japan',           flag:'🇯🇵', continent:'Asia',     capital:'Tokyo',        lat:36.2048, lng:138.2529, peakTemp:39.5, humidity:65, population:'124M',  riskLevel:'moderate',alertStatus:'Yellow', deaths:67,  hosp:4320,  shelterCount:1890, incidents:28,  heatWaveDays:11 },
+  { name:'South Korea',     flag:'🇰🇷', continent:'Asia',     capital:'Seoul',        lat:35.9078, lng:127.7669, peakTemp:37.8, humidity:62, population:'52M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:23,  hosp:1780,  shelterCount:780,  incidents:18,  heatWaveDays:8  },
+  { name:'Thailand',        flag:'🇹🇭', continent:'Asia',     capital:'Bangkok',      lat:15.8700, lng:100.9925, peakTemp:41.5, humidity:75, population:'72M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:34,  hosp:2140,  shelterCount:540,  incidents:22,  heatWaveDays:13 },
+  { name:'Vietnam',         flag:'🇻🇳', continent:'Asia',     capital:'Hanoi',        lat:14.0583, lng:108.2772, peakTemp:40.8, humidity:78, population:'98M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:28,  hosp:1890,  shelterCount:420,  incidents:19,  heatWaveDays:12 },
+  { name:'Philippines',     flag:'🇵🇭', continent:'Asia',     capital:'Manila',       lat:12.8797, lng:121.7740, peakTemp:38.9, humidity:82, population:'115M',  riskLevel:'moderate',alertStatus:'Yellow', deaths:19,  hosp:1230,  shelterCount:340,  incidents:14,  heatWaveDays:9  },
+  // MIDDLE EAST
+  { name:'Kuwait',          flag:'🇰🇼', continent:'M.East',   capital:'Kuwait City',  lat:29.3759, lng:47.9774,  peakTemp:52.1, humidity:8,  population:'4.3M',  riskLevel:'extreme', alertStatus:'Red',    deaths:98,  hosp:2140,  shelterCount:230,  incidents:41,  heatWaveDays:31 },
+  { name:'Iraq',            flag:'🇮🇶', continent:'M.East',   capital:'Baghdad',      lat:33.2232, lng:43.6793,  peakTemp:51.2, humidity:10, population:'43M',   riskLevel:'extreme', alertStatus:'Red',    deaths:234, hosp:7840,  shelterCount:680,  incidents:112, heatWaveDays:28 },
+  { name:'Saudi Arabia',    flag:'🇸🇦', continent:'M.East',   capital:'Riyadh',       lat:23.8859, lng:45.0792,  peakTemp:50.8, humidity:9,  population:'36M',   riskLevel:'extreme', alertStatus:'Red',    deaths:156, hosp:4320,  shelterCount:890,  incidents:78,  heatWaveDays:25 },
+  { name:'Oman',            flag:'🇴🇲', continent:'M.East',   capital:'Muscat',       lat:21.4735, lng:55.9754,  peakTemp:50.1, humidity:14, population:'4.5M',  riskLevel:'extreme', alertStatus:'Red',    deaths:45,  hosp:1340,  shelterCount:210,  incidents:32,  heatWaveDays:24 },
+  { name:'UAE',             flag:'🇦🇪', continent:'M.East',   capital:'Abu Dhabi',    lat:23.4241, lng:53.8478,  peakTemp:49.3, humidity:12, population:'10M',   riskLevel:'extreme', alertStatus:'Red',    deaths:43,  hosp:1230,  shelterCount:340,  incidents:29,  heatWaveDays:22 },
+  { name:'Iran',            flag:'🇮🇷', continent:'M.East',   capital:'Tehran',       lat:32.4279, lng:53.6880,  peakTemp:48.7, humidity:11, population:'88M',   riskLevel:'extreme', alertStatus:'Red',    deaths:178, hosp:6780,  shelterCount:1120, incidents:94,  heatWaveDays:20 },
+  { name:'Syria',           flag:'🇸🇾', continent:'M.East',   capital:'Damascus',     lat:34.8021, lng:38.9968,  peakTemp:45.8, humidity:12, population:'19M',   riskLevel:'high',    alertStatus:'Orange', deaths:89,  hosp:2340,  shelterCount:120,  incidents:67,  heatWaveDays:19 },
+  { name:'Yemen',           flag:'🇾🇪', continent:'M.East',   capital:'Sanaa',        lat:15.5527, lng:48.5164,  peakTemp:44.2, humidity:22, population:'34M',   riskLevel:'high',    alertStatus:'Orange', deaths:121, hosp:2890,  shelterCount:85,   incidents:98,  heatWaveDays:23 },
+  { name:'Jordan',          flag:'🇯🇴', continent:'M.East',   capital:'Amman',        lat:30.5852, lng:36.2384,  peakTemp:44.5, humidity:15, population:'10M',   riskLevel:'high',    alertStatus:'Orange', deaths:34,  hosp:1780,  shelterCount:280,  incidents:31,  heatWaveDays:17 },
+  { name:'Israel',          flag:'🇮🇱', continent:'M.East',   capital:'Jerusalem',    lat:31.0461, lng:34.8516,  peakTemp:42.1, humidity:28, population:'9.4M',  riskLevel:'high',    alertStatus:'Orange', deaths:18,  hosp:890,   shelterCount:280,  incidents:23,  heatWaveDays:15 },
+  // AFRICA
+  { name:'Sudan',           flag:'🇸🇩', continent:'Africa',   capital:'Khartoum',     lat:12.8628, lng:30.2176,  peakTemp:48.4, humidity:13, population:'46M',   riskLevel:'extreme', alertStatus:'Red',    deaths:143, hosp:3780,  shelterCount:210,  incidents:88,  heatWaveDays:26 },
+  { name:'Libya',           flag:'🇱🇾', continent:'Africa',   capital:'Tripoli',      lat:26.3351, lng:17.2283,  peakTemp:47.3, humidity:14, population:'6.8M',  riskLevel:'extreme', alertStatus:'Red',    deaths:78,  hosp:1890,  shelterCount:145,  incidents:56,  heatWaveDays:24 },
+  { name:'Egypt',           flag:'🇪🇬', continent:'Africa',   capital:'Cairo',        lat:26.8206, lng:30.8025,  peakTemp:46.8, humidity:16, population:'105M',  riskLevel:'extreme', alertStatus:'Red',    deaths:167, hosp:5670,  shelterCount:780,  incidents:89,  heatWaveDays:21 },
+  { name:'Somalia',         flag:'🇸🇴', continent:'Africa',   capital:'Mogadishu',    lat:5.1521,  lng:46.1996,  peakTemp:43.8, humidity:38, population:'17M',   riskLevel:'high',    alertStatus:'Orange', deaths:98,  hosp:1890,  shelterCount:78,   incidents:76,  heatWaveDays:20 },
+  { name:'Algeria',         flag:'🇩🇿', continent:'Africa',   capital:'Algiers',      lat:28.0339, lng:1.6596,   peakTemp:45.2, humidity:18, population:'45M',   riskLevel:'high',    alertStatus:'Orange', deaths:87,  hosp:3120,  shelterCount:340,  incidents:62,  heatWaveDays:18 },
+  { name:'Morocco',         flag:'🇲🇦', continent:'Africa',   capital:'Rabat',        lat:31.7917, lng:-7.0926,  peakTemp:43.7, humidity:24, population:'37M',   riskLevel:'high',    alertStatus:'Orange', deaths:54,  hosp:2340,  shelterCount:420,  incidents:41,  heatWaveDays:16 },
+  { name:'Ethiopia',        flag:'🇪🇹', continent:'Africa',   capital:'Addis Ababa',  lat:9.1450,  lng:40.4897,  peakTemp:40.8, humidity:35, population:'128M',  riskLevel:'moderate',alertStatus:'Yellow', deaths:34,  hosp:2140,  shelterCount:290,  incidents:28,  heatWaveDays:12 },
+  { name:'Nigeria',         flag:'🇳🇬', continent:'Africa',   capital:'Abuja',        lat:9.0820,  lng:8.6753,   peakTemp:41.2, humidity:58, population:'220M',  riskLevel:'moderate',alertStatus:'Yellow', deaths:28,  hosp:1890,  shelterCount:340,  incidents:31,  heatWaveDays:10 },
+  { name:'Kenya',           flag:'🇰🇪', continent:'Africa',   capital:'Nairobi',      lat:-0.0236, lng:37.9062,  peakTemp:39.5, humidity:48, population:'55M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:19,  hosp:1120,  shelterCount:210,  incidents:16,  heatWaveDays:9  },
+  { name:'South Africa',    flag:'🇿🇦', continent:'Africa',   capital:'Pretoria',     lat:-30.5595,lng:22.9375,  peakTemp:36.5, humidity:42, population:'60M',   riskLevel:'low',     alertStatus:'Green',  deaths:8,   hosp:450,   shelterCount:120,  incidents:12,  heatWaveDays:5  },
+  // EUROPE
+  { name:'Spain',           flag:'🇪🇸', continent:'Europe',   capital:'Madrid',       lat:40.4637, lng:-3.7492,  peakTemp:45.0, humidity:20, population:'47M',   riskLevel:'high',    alertStatus:'Orange', deaths:234, hosp:8920,  shelterCount:1240, incidents:78,  heatWaveDays:16 },
+  { name:'Portugal',        flag:'🇵🇹', continent:'Europe',   capital:'Lisbon',       lat:39.3999, lng:-8.2245,  peakTemp:44.2, humidity:22, population:'10M',   riskLevel:'high',    alertStatus:'Orange', deaths:156, hosp:4320,  shelterCount:540,  incidents:54,  heatWaveDays:14 },
+  { name:'Greece',          flag:'🇬🇷', continent:'Europe',   capital:'Athens',       lat:39.0742, lng:21.8243,  peakTemp:43.5, humidity:25, population:'11M',   riskLevel:'high',    alertStatus:'Orange', deaths:89,  hosp:3120,  shelterCount:420,  incidents:43,  heatWaveDays:15 },
+  { name:'Italy',           flag:'🇮🇹', continent:'Europe',   capital:'Rome',         lat:41.8719, lng:12.5674,  peakTemp:42.8, humidity:28, population:'60M',   riskLevel:'high',    alertStatus:'Orange', deaths:178, hosp:6780,  shelterCount:890,  incidents:67,  heatWaveDays:13 },
+  { name:'Turkey',          flag:'🇹🇷', continent:'Europe',   capital:'Ankara',       lat:38.9637, lng:35.2433,  peakTemp:44.8, humidity:22, population:'85M',   riskLevel:'high',    alertStatus:'Orange', deaths:112, hosp:5430,  shelterCount:780,  incidents:58,  heatWaveDays:17 },
+  { name:'France',          flag:'🇫🇷', continent:'Europe',   capital:'Paris',        lat:46.2276, lng:2.2137,   peakTemp:40.1, humidity:32, population:'68M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:78,  hosp:4560,  shelterCount:780,  incidents:34,  heatWaveDays:10 },
+  { name:'Germany',         flag:'🇩🇪', continent:'Europe',   capital:'Berlin',       lat:51.1657, lng:10.4515,  peakTemp:38.2, humidity:45, population:'84M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:34,  hosp:2340,  shelterCount:560,  incidents:18,  heatWaveDays:7  },
+  { name:'United Kingdom',  flag:'🇬🇧', continent:'Europe',   capital:'London',       lat:55.3781, lng:-3.4360,  peakTemp:37.8, humidity:48, population:'67M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:18,  hosp:1340,  shelterCount:320,  incidents:12,  heatWaveDays:5  },
+  // AMERICAS
+  { name:'USA',             flag:'🇺🇸', continent:'Americas', capital:'Washington DC', lat:37.0902, lng:-95.7129, peakTemp:46.5, humidity:18, population:'335M',  riskLevel:'high',    alertStatus:'Orange', deaths:189, hosp:12340, shelterCount:3240, incidents:89,  heatWaveDays:14 },
+  { name:'Mexico',          flag:'🇲🇽', continent:'Americas', capital:'Mexico City',  lat:23.6345, lng:-102.5528,peakTemp:44.1, humidity:28, population:'131M',  riskLevel:'high',    alertStatus:'Orange', deaths:123, hosp:5670,  shelterCount:890,  incidents:67,  heatWaveDays:16 },
+  { name:'Canada',          flag:'🇨🇦', continent:'Americas', capital:'Ottawa',       lat:56.1304, lng:-106.3468,peakTemp:39.8, humidity:35, population:'38M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:18,  hosp:1230,  shelterCount:320,  incidents:12,  heatWaveDays:8  },
+  { name:'Brazil',          flag:'🇧🇷', continent:'Americas', capital:'Brasilia',     lat:-14.2350,lng:-51.9253, peakTemp:41.2, humidity:55, population:'215M',  riskLevel:'moderate',alertStatus:'Yellow', deaths:45,  hosp:3240,  shelterCount:780,  incidents:34,  heatWaveDays:11 },
+  { name:'Argentina',       flag:'🇦🇷', continent:'Americas', capital:'Buenos Aires', lat:-38.4161,lng:-63.6167, peakTemp:39.8, humidity:40, population:'46M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:23,  hosp:1560,  shelterCount:340,  incidents:18,  heatWaveDays:9  },
+  { name:'Colombia',        flag:'🇨🇴', continent:'Americas', capital:'Bogota',       lat:4.5709,  lng:-74.2973, peakTemp:37.5, humidity:68, population:'52M',   riskLevel:'moderate',alertStatus:'Yellow', deaths:12,  hosp:890,   shelterCount:210,  incidents:10,  heatWaveDays:7  },
+  { name:'Peru',            flag:'🇵🇪', continent:'Americas', capital:'Lima',         lat:-9.1900, lng:-75.0152, peakTemp:36.8, humidity:55, population:'33M',   riskLevel:'low',     alertStatus:'Green',  deaths:8,   hosp:540,   shelterCount:140,  incidents:7,   heatWaveDays:5  },
+  // OCEANIA
+  { name:'Australia',       flag:'🇦🇺', continent:'Oceania',  capital:'Canberra',     lat:-25.2744,lng:133.7751, peakTemp:47.8, humidity:15, population:'26M',   riskLevel:'extreme', alertStatus:'Red',    deaths:78,  hosp:2340,  shelterCount:540,  incidents:43,  heatWaveDays:18 },
+  { name:'New Zealand',     flag:'🇳🇿', continent:'Oceania',  capital:'Wellington',   lat:-40.9006,lng:174.8860, peakTemp:33.2, humidity:55, population:'5M',    riskLevel:'low',     alertStatus:'Green',  deaths:2,   hosp:120,   shelterCount:45,   incidents:3,   heatWaveDays:4  },
 ];
+
+// Keep backward compat ref
+const REGIONS = WORLD_COUNTRIES;
 
 const TEMP_HOURS = (() => {
   const now = new Date();
@@ -326,41 +379,104 @@ function initSidebar() {
 //  DASHBOARD
 // ══════════════════════════════════════════════════════════════
 
+// ── Populate all country dropdowns ───────────────────────────────
+function populateCountryDropdowns() {
+  const sorted = [...WORLD_COUNTRIES].sort((a,b) => a.name.localeCompare(b.name));
+  const selectIds = ['filterCountrySearch','incCountry','shelCountry','filterShelterCountry','filterContry','rptRegion'];
+  selectIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Keep first option (All Countries / placeholder)
+    while (el.options.length > 1) el.remove(1);
+    sorted.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.name;
+      opt.textContent = `${c.flag} ${c.name}`;
+      el.appendChild(opt);
+    });
+  });
+  // Fly-to dropdown
+  const flyEl = document.getElementById('mapCountryFlyTo');
+  if (flyEl) {
+    while (flyEl.options.length > 1) flyEl.remove(1);
+    WORLD_COUNTRIES.sort((a,b) => a.name.localeCompare(b.name)).forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = `${c.lat},${c.lng}`;
+      opt.textContent = `${c.flag} ${c.name} — ${c.capital}`;
+      flyEl.appendChild(opt);
+    });
+  }
+}
+
+// ── World Risk Strip ────────────────────────────────────────────
+function updateWorldRiskStrip(data) {
+  const src = data || WORLD_COUNTRIES;
+  const counts = { extreme:0, high:0, moderate:0, low:0 };
+  src.forEach(c => counts[c.riskLevel] = (counts[c.riskLevel]||0) + 1);
+  document.getElementById('wrsExtreme').textContent  = counts.extreme  || 0;
+  document.getElementById('wrsHigh').textContent     = counts.high     || 0;
+  document.getElementById('wrsModerate').textContent = counts.moderate || 0;
+  document.getElementById('wrsLow').textContent      = counts.low      || 0;
+  document.getElementById('wrsTotal').textContent    = src.length;
+}
+
+// ── Dashboard Risk Table (Global) ──────────────────────────────
+const ALERT_COLORS = { Red:'var(--danger-light)', Orange:'var(--heat-orange)', Yellow:'var(--warning-amber)', Green:'var(--safe-teal)' };
+
 function renderRiskTable() {
-  const tbody = document.getElementById('riskTableBody');
+  const tbody        = document.getElementById('riskTableBody');
+  const contFilter   = document.getElementById('filterContinent')?.value  || 'all';
+  const riskFilter   = document.getElementById('filterRiskLevel')?.value   || 'all';
+  const countryFilter= document.getElementById('filterCountrySearch')?.value || 'all';
+  const sortBy       = document.getElementById('sortWorldTable')?.value    || 'temp';
+
+  let data = [...WORLD_COUNTRIES];
+  if (contFilter    !== 'all') data = data.filter(c => c.continent   === contFilter);
+  if (riskFilter    !== 'all') data = data.filter(c => c.riskLevel   === riskFilter);
+  if (countryFilter !== 'all') data = data.filter(c => c.name        === countryFilter);
+
+  const sortFns = {
+    temp:   (a,b) => b.peakTemp - a.peakTemp,
+    deaths: (a,b) => b.deaths   - a.deaths,
+    hosp:   (a,b) => b.hosp     - a.hosp,
+    name:   (a,b) => a.name.localeCompare(b.name)
+  };
+  data.sort(sortFns[sortBy] || sortFns.temp);
+
   tbody.innerHTML = '';
-  REGIONS.forEach(r => {
+  data.forEach(c => {
+    const alertCol = ALERT_COLORS[c.alertStatus] || 'var(--text-secondary)';
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td style="color: var(--text-primary); font-weight:600">${r.name}</td>
-      <td style="color: var(--heat-orange); font-weight:700">${r.temp}°</td>
-      <td>${r.humidity}%</td>
-      <td>${r.population}</td>
-      <td><span class="risk-badge ${r.risk}">${r.risk.charAt(0).toUpperCase() + r.risk.slice(1)}</span></td>
+      <td style="font-weight:700;color:var(--text-primary)">${c.flag} ${c.name}</td>
+      <td style="color:var(--text-secondary);font-size:12px">${c.continent}</td>
+      <td style="color:var(--heat-orange);font-weight:700">${c.peakTemp}°</td>
+      <td>${c.humidity}%</td>
+      <td style="font-size:12px">${c.population}</td>
+      <td style="color:var(--danger-light);font-weight:600">${c.deaths.toLocaleString()}</td>
+      <td style="color:var(--warning-amber)">${c.hosp.toLocaleString()}</td>
+      <td><span style="color:${alertCol};font-weight:700;font-size:11px">${c.alertStatus}</span></td>
+      <td><span class="risk-badge ${c.riskLevel}">${c.riskLevel.charAt(0).toUpperCase()+c.riskLevel.slice(1)}</span></td>
     `;
     tbody.appendChild(tr);
   });
+
+  updateWorldRiskStrip(data);
+  updateGlobalTempChart(data);
+  document.getElementById('globalChartBadge').textContent =
+    countryFilter !== 'all' ? countryFilter :
+    contFilter    !== 'all' ? contFilter :
+    'All Countries';
 }
 
-function updateDashboardStats() {
-  const activeInc = APP.incidents.filter(i => i.status === 'Active').length;
-  const totalShelterCap  = APP.shelters.reduce((a, s) => a + Number(s.capacity), 0);
-  const totalShelterOcc  = APP.shelters.reduce((a, s) => a + Number(s.occupancy), 0);
-  const pct = totalShelterCap ? Math.round(totalShelterOcc / totalShelterCap * 100) : 0;
-
-  document.getElementById('statIncidents').textContent = activeInc;
-  document.getElementById('statIncidentSub').textContent = activeInc
-    ? `${activeInc} requiring attention`
-    : 'No active incidents';
-
-  if (totalShelterCap > 0) {
-    document.getElementById('statShelters').textContent = `${pct}%`;
-    document.getElementById('statShelterSub').textContent = `${totalShelterOcc.toLocaleString()} / ${totalShelterCap.toLocaleString()} occupied`;
-  }
-
-  // Update nav badge
-  document.getElementById('incidentCountBadge').textContent = APP.incidents.length;
+function initWorldTableFilters() {
+  ['filterContinent','filterRiskLevel','filterCountrySearch','sortWorldTable'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', renderRiskTable);
+  });
 }
+
+
 
 // ══════════════════════════════════════════════════════════════
 //  CHARTS
@@ -574,6 +690,94 @@ function initHistoricalChart() {
   });
 }
 
+// ── Update Dashboard Stats ────────────────────────────────────────────
+function updateDashboardStats() {
+  const activeInc = APP.incidents.filter(i => i.status === 'Active').length;
+  const totalShelterCap = APP.shelters.reduce((a, s) => a + Number(s.capacity), 0);
+  const totalShelterOcc = APP.shelters.reduce((a, s) => a + Number(s.occupancy), 0);
+  const pct = totalShelterCap ? Math.round(totalShelterOcc / totalShelterCap * 100) : 0;
+
+  document.getElementById('statIncidents').textContent = activeInc;
+  document.getElementById('statIncidentSub').textContent = activeInc ? `${activeInc} requiring attention` : 'No active incidents';
+
+  if (totalShelterCap > 0) {
+    document.getElementById('statShelters').textContent = `${pct}%`;
+    document.getElementById('statShelterSub').textContent = `${totalShelterOcc.toLocaleString()} / ${totalShelterCap.toLocaleString()} occupied`;
+  }
+  document.getElementById('incidentCountBadge').textContent = APP.incidents.length;
+}
+
+// ── Global Top-20 Temperature Chart ──────────────────────────────
+function initGlobalTempChart() {
+  const ctx = document.getElementById('globalTempChart')?.getContext('2d');
+  if (!ctx) return;
+  const top20 = [...WORLD_COUNTRIES].sort((a,b) => b.peakTemp - a.peakTemp).slice(0, 20);
+  const cols  = top20.map(c => {
+    if (c.riskLevel === 'extreme')  return 'rgba(214,40,57,0.85)';
+    if (c.riskLevel === 'high')     return 'rgba(255,107,53,0.85)';
+    if (c.riskLevel === 'moderate') return 'rgba(247,167,49,0.85)';
+    return 'rgba(46,196,182,0.85)';
+  });
+
+  APP.charts.globalTemp = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: top20.map(c => `${c.flag} ${c.name}`),
+      datasets: [{
+        label: 'Peak Temp (°C)',
+        data:  top20.map(c => c.peakTemp),
+        backgroundColor: cols,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#161C2B',
+          borderColor: '#242D42',
+          borderWidth: 1,
+          callbacks: {
+            label: ctx => ` ${ctx.parsed.x}°C — ${WORLD_COUNTRIES.find(c => c.name === ctx.label.slice(ctx.label.indexOf(' ')+1))?.alertStatus || ''} Alert`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: CHART_DEFAULTS.grid },
+          ticks: { color: CHART_DEFAULTS.tick, callback: v => v + '°C', font: { size: 10 } },
+          min: 30, max: 56
+        },
+        y: {
+          grid: { display: false },
+          ticks: { color: CHART_DEFAULTS.color, font: { size: 11 } }
+        }
+      }
+    }
+  });
+}
+
+function updateGlobalTempChart(data) {
+  if (!APP.charts.globalTemp) return;
+  const top20 = [...data].sort((a,b) => b.peakTemp - a.peakTemp).slice(0, 20);
+  const cols  = top20.map(c => {
+    if (c.riskLevel === 'extreme')  return 'rgba(214,40,57,0.85)';
+    if (c.riskLevel === 'high')     return 'rgba(255,107,53,0.85)';
+    if (c.riskLevel === 'moderate') return 'rgba(247,167,49,0.85)';
+    return 'rgba(46,196,182,0.85)';
+  });
+  APP.charts.globalTemp.data.labels = top20.map(c => `${c.flag} ${c.name}`);
+  APP.charts.globalTemp.data.datasets[0].data = top20.map(c => c.peakTemp);
+  APP.charts.globalTemp.data.datasets[0].backgroundColor = cols;
+  APP.charts.globalTemp.update();
+}
+
+
+
 // ══════════════════════════════════════════════════════════════
 //  MAP
 // ══════════════════════════════════════════════════════════════
@@ -582,12 +786,11 @@ function initMap() {
   if (APP.map) return;
 
   APP.map = L.map('heatMap', {
-    center: [37.6, 15.4],
-    zoom: 8,
+    center: [20, 15],
+    zoom: 2,
     zoomControl: true
   });
 
-  // Dark tile layer
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '© OpenStreetMap contributors © CARTO',
     subdomains: 'abcd',
@@ -595,6 +798,36 @@ function initMap() {
   }).addTo(APP.map);
 
   renderMapLayers();
+
+  // Continent pill filter
+  document.querySelectorAll('.continent-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.continent-pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cont = btn.dataset.continent;
+      renderMapLayers(cont === 'all' ? null : cont);
+      // Fit bounds to filtered countries
+      if (cont !== 'all') {
+        const filtered = WORLD_COUNTRIES.filter(c => c.continent === cont);
+        if (filtered.length > 0) {
+          const lats = filtered.map(c => c.lat);
+          const lngs = filtered.map(c => c.lng);
+          APP.map.fitBounds([[Math.min(...lats)-5, Math.min(...lngs)-10],[Math.max(...lats)+5, Math.max(...lngs)+10]], { padding:[30,30] });
+        }
+      } else {
+        APP.map.setView([20, 15], 2);
+      }
+    });
+  });
+
+  // Fly-to country
+  const flyEl = document.getElementById('mapCountryFlyTo');
+  if (flyEl) {
+    flyEl.addEventListener('change', () => {
+      const [lat, lng] = flyEl.value.split(',').map(Number);
+      if (!isNaN(lat)) APP.map.flyTo([lat, lng], 5, { duration: 1.5 });
+    });
+  }
 
   // Layer toggles
   document.getElementById('layerRisk').addEventListener('change', e => {
@@ -609,91 +842,108 @@ function initMap() {
     if (e.target.checked) { APP.mapLayers.incidents && APP.map.addLayer(APP.mapLayers.incidents); }
     else { APP.mapLayers.incidents && APP.map.removeLayer(APP.mapLayers.incidents); }
   });
+
+  updateMapGlobalStats();
 }
 
+function updateMapGlobalStats(filteredContinent) {
+  const data = filteredContinent
+    ? WORLD_COUNTRIES.filter(c => c.continent === filteredContinent)
+    : WORLD_COUNTRIES;
+  const counts = { extreme:0, high:0, moderate:0, low:0 };
+  let totalDeaths = 0, totalShelters = 0;
+  data.forEach(c => {
+    counts[c.riskLevel]++;
+    totalDeaths  += c.deaths;
+    totalShelters += c.shelterCount;
+  });
+  document.getElementById('mapExtCount').textContent    = counts.extreme;
+  document.getElementById('mapHighCount').textContent   = counts.high;
+  document.getElementById('mapModCount').textContent    = counts.moderate;
+  document.getElementById('mapLowCount').textContent    = counts.low;
+  document.getElementById('mapTotalDeaths').textContent = totalDeaths.toLocaleString();
+  document.getElementById('mapShelterCount').textContent= totalShelters.toLocaleString();
+}
+
+
 const RISK_COLORS = {
-  extreme:  { color: '#D62839', fillOpacity: 0.35 },
-  high:     { color: '#FF6B35', fillOpacity: 0.28 },
-  moderate: { color: '#F7A731', fillOpacity: 0.22 },
-  low:      { color: '#2EC4B6', fillOpacity: 0.18 }
+  extreme:  { color: '#D62839', fillOpacity: 0.5 },
+  high:     { color: '#FF6B35', fillOpacity: 0.4 },
+  moderate: { color: '#F7A731', fillOpacity: 0.3 },
+  low:      { color: '#2EC4B6', fillOpacity: 0.25 }
 };
 
-const ZONE_OFFSETS = [
-  [0, 0], [0.12, 0.18], [-0.15, -0.1], [0.2, -0.25],
-  [-0.08, 0.3], [-0.25, 0.12], [0.1, 0.4]
-];
-
-function renderMapLayers() {
-  // Remove existing layers
+function renderMapLayers(continentFilter) {
   Object.values(APP.mapLayers).forEach(l => l && APP.map.removeLayer(l));
 
-  // Risk zone circles
+  const data = continentFilter
+    ? WORLD_COUNTRIES.filter(c => c.continent === continentFilter)
+    : WORLD_COUNTRIES;
+
+  // Country risk circles
   const riskGroup = L.layerGroup();
-  REGIONS.forEach((r, i) => {
-    const off = ZONE_OFFSETS[i] || [0, 0];
-    const cfg = RISK_COLORS[r.risk];
-    const circle = L.circle(
-      [r.lat + off[0], r.lng + off[1]],
-      {
-        radius: 18000,
-        color: cfg.color,
-        fillColor: cfg.color,
-        fillOpacity: cfg.fillOpacity,
-        weight: 2,
-        dashArray: r.risk === 'extreme' ? '6 4' : ''
-      }
-    );
+  data.forEach(c => {
+    const cfg = RISK_COLORS[c.riskLevel];
+    const radius = c.population.includes('B') ? 600000 : c.population.includes('M') && parseInt(c.population) > 100 ? 500000 : 350000;
+    const circle = L.circle([c.lat, c.lng], {
+      radius,
+      color: cfg.color,
+      fillColor: cfg.color,
+      fillOpacity: cfg.fillOpacity,
+      weight: c.riskLevel === 'extreme' ? 2 : 1,
+      dashArray: c.riskLevel === 'extreme' ? '6 4' : ''
+    });
     circle.bindPopup(`
       <div class="map-popup">
-        <h4>${r.name}</h4>
-        <div class="pop-row"><span class="pop-label">Temperature</span><span class="pop-val" style="color:#FF6B35">${r.temp}°C</span></div>
-        <div class="pop-row"><span class="pop-label">Humidity</span><span class="pop-val">${r.humidity}%</span></div>
-        <div class="pop-row"><span class="pop-label">Population</span><span class="pop-val">${r.population}</span></div>
-        <div class="pop-row"><span class="pop-label">Risk Level</span><span class="pop-val" style="color:${cfg.color}">${r.risk.toUpperCase()}</span></div>
+        <h4>${c.flag} ${c.name}</h4>
+        <div class="pop-row"><span class="pop-label">Capital</span><span class="pop-val">${c.capital}</span></div>
+        <div class="pop-row"><span class="pop-label">Peak Temp</span><span class="pop-val" style="color:#FF6B35">${c.peakTemp}°C</span></div>
+        <div class="pop-row"><span class="pop-label">Alert</span><span class="pop-val" style="color:${ALERT_COLORS[c.alertStatus]}">${c.alertStatus}</span></div>
+        <div class="pop-row"><span class="pop-label">Deaths</span><span class="pop-val" style="color:#D62839">${c.deaths.toLocaleString()}</span></div>
+        <div class="pop-row"><span class="pop-label">Hospitalised</span><span class="pop-val">${c.hosp.toLocaleString()}</span></div>
+        <div class="pop-row"><span class="pop-label">Population</span><span class="pop-val">${c.population}</span></div>
+        <div class="pop-row"><span class="pop-label">Risk Level</span><span class="pop-val" style="color:${cfg.color}">${c.riskLevel.toUpperCase()}</span></div>
       </div>
-    `, { maxWidth: 220 });
-    riskGroup.addLayer(circle);
+    `, { maxWidth: 240 });
 
-    // Region label marker
+    // Country label
     const labelIcon = L.divIcon({
       className: '',
-      html: `<div style="background:rgba(0,0,0,0.75);color:#F0F4FF;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;font-family:Inter,sans-serif;white-space:nowrap;border:1px solid ${cfg.color}">${r.name.split('–')[0].trim()}</div>`,
-      iconAnchor: [30, 10]
+      html: `<div style="background:rgba(0,0,0,0.8);color:#F0F4FF;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;font-family:Inter,sans-serif;white-space:nowrap;border:1px solid ${cfg.color}">${c.flag} ${c.name}</div>`,
+      iconAnchor: [40, 10]
     });
-    L.marker([r.lat + off[0], r.lng + off[1]], { icon: labelIcon, interactive: false }).addTo(riskGroup);
+    L.marker([c.lat, c.lng], { icon: labelIcon, interactive: false }).addTo(riskGroup);
+    riskGroup.addLayer(circle);
   });
+
   APP.mapLayers.risk = riskGroup;
   riskGroup.addTo(APP.map);
 
-  // Shelter markers
   refreshMapShelters();
-
-  // Incident markers
   refreshMapIncidents();
+  updateMapGlobalStats(continentFilter);
 }
 
-function refreshMapShelters() {
-  if (APP.mapLayers.shelters) APP.map.removeLayer(APP.mapLayers.shelters);
 
+function refreshMapShelters() {
+  if (!APP.map) return;
+  if (APP.mapLayers.shelters) APP.map.removeLayer(APP.mapLayers.shelters);
   const group = L.layerGroup();
   const shelterIcon = L.divIcon({
     className: '',
     html: `<div style="background:#2EC4B6;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 0 8px rgba(46,196,182,0.5);border:2px solid rgba(46,196,182,0.8)">🏥</div>`,
     iconAnchor: [11, 11]
   });
-
   APP.shelters.forEach((s, idx) => {
-    const region = REGIONS.find(r => r.name === s.region) || REGIONS[idx % REGIONS.length];
-    const off = ZONE_OFFSETS[idx % ZONE_OFFSETS.length];
+    const country = WORLD_COUNTRIES.find(c => c.name === s.country) || WORLD_COUNTRIES[idx % WORLD_COUNTRIES.length];
+    const jitter = [(Math.random()-0.5)*2, (Math.random()-0.5)*2];
     const pct = Math.round(Number(s.occupancy) / Number(s.capacity) * 100);
-    const marker = L.marker(
-      [region.lat + off[0] + 0.05, region.lng + off[1] + 0.05],
-      { icon: shelterIcon }
-    );
+    const marker = L.marker([country.lat + jitter[0], country.lng + jitter[1]], { icon: shelterIcon });
     marker.bindPopup(`
       <div class="map-popup">
         <h4>🏥 ${s.name}</h4>
-        <div class="pop-row"><span class="pop-label">Region</span><span class="pop-val">${s.region}</span></div>
+        <div class="pop-row"><span class="pop-label">Country</span><span class="pop-val">${s.country}</span></div>
+        <div class="pop-row"><span class="pop-label">City</span><span class="pop-val">${s.city || s.region || '—'}</span></div>
         <div class="pop-row"><span class="pop-label">Occupancy</span><span class="pop-val">${s.occupancy} / ${s.capacity} (${pct}%)</span></div>
         <div class="pop-row"><span class="pop-label">Water</span><span class="pop-val">${s.water}</span></div>
         <div class="pop-row"><span class="pop-label">Medical</span><span class="pop-val">${s.medical}</span></div>
@@ -701,45 +951,37 @@ function refreshMapShelters() {
     `, { maxWidth: 220 });
     group.addLayer(marker);
   });
-
   APP.mapLayers.shelters = group;
-  if (document.getElementById('layerShelters').checked) group.addTo(APP.map);
-
-  // Update map stat
+  if (document.getElementById('layerShelters')?.checked) group.addTo(APP.map);
   document.getElementById('mapShelterCount').textContent = APP.shelters.length;
 }
 
-function refreshMapIncidents() {
-  if (APP.mapLayers.incidents) APP.map.removeLayer(APP.mapLayers.incidents);
 
+function refreshMapIncidents() {
+  if (!APP.map) return;
+  if (APP.mapLayers.incidents) APP.map.removeLayer(APP.mapLayers.incidents);
   const group = L.layerGroup();
   const COLORS = { Critical: '#D62839', High: '#FF6B35', Moderate: '#F7A731', Low: '#2EC4B6' };
-
-  APP.incidents.filter(i => i.status !== 'Resolved').forEach((inc, idx) => {
-    const region = REGIONS.find(r => r.name === inc.region) || REGIONS[0];
+  APP.incidents.filter(i => i.status !== 'Resolved').forEach((inc) => {
+    const country = WORLD_COUNTRIES.find(c => c.name === inc.country) || WORLD_COUNTRIES[0];
     const col = COLORS[inc.severity] || '#8A9BB8';
+    const jitter = [(Math.random()-0.5)*3, (Math.random()-0.5)*3];
     const iconHtml = `<div style="background:${col};width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);box-shadow:0 0 8px ${col}66;display:flex;align-items:center;justify-content:center;font-size:10px">⚠</div>`;
     const icon = L.divIcon({ className: '', html: iconHtml, iconAnchor: [9, 9] });
-    const marker = L.marker(
-      [region.lat + (Math.random()-0.5)*0.1, region.lng + (Math.random()-0.5)*0.1],
-      { icon }
-    );
+    const marker = L.marker([country.lat + jitter[0], country.lng + jitter[1]], { icon });
     marker.bindPopup(`
       <div class="map-popup">
         <h4>⚠️ ${inc.type}</h4>
+        <div class="pop-row"><span class="pop-label">Country</span><span class="pop-val">${inc.country}</span></div>
         <div class="pop-row"><span class="pop-label">Region</span><span class="pop-val">${inc.region}</span></div>
         <div class="pop-row"><span class="pop-label">Severity</span><span class="pop-val" style="color:${col}">${inc.severity}</span></div>
         <div class="pop-row"><span class="pop-label">Casualties</span><span class="pop-val">${inc.casualties}</span></div>
-        <div class="pop-row"><span class="pop-label">Status</span><span class="pop-val">${inc.status}</span></div>
       </div>
     `, { maxWidth: 220 });
     group.addLayer(marker);
   });
-
   APP.mapLayers.incidents = group;
-  if (document.getElementById('layerIncidents') && document.getElementById('layerIncidents').checked) {
-    group.addTo(APP.map);
-  }
+  if (document.getElementById('layerIncidents')?.checked) group.addTo(APP.map);
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -749,17 +991,23 @@ function refreshMapIncidents() {
 function initIncidentForm() {
   document.getElementById('incidentForm').addEventListener('submit', e => {
     e.preventDefault();
+    const country = document.getElementById('incCountry').value;
+    const region  = document.getElementById('incRegion').value;
     const inc = {
-      id: uuid(),
-      type: document.getElementById('incType').value,
-      region: document.getElementById('incRegion').value,
-      severity: document.getElementById('incSeverity').value,
+      id:         uuid(),
+      type:       document.getElementById('incType').value,
+      country,
+      region,
+      severity:   document.getElementById('incSeverity').value,
       casualties: Number(document.getElementById('incCasualties').value) || 0,
-      reporter: document.getElementById('incReporter').value,
-      notes: document.getElementById('incNotes').value,
-      status: 'Active',
-      timestamp: new Date().toISOString()
+      reporter:   document.getElementById('incReporter').value,
+      notes:      document.getElementById('incNotes').value,
+      status:     'Active',
+      timestamp:  new Date().toISOString()
     };
+    const wc = WORLD_COUNTRIES.find(c => c.name === country);
+    inc.continent = wc ? wc.continent : '';
+    inc.flag      = wc ? wc.flag      : '🏳️';
 
     APP.incidents.unshift(inc);
     saveData();
@@ -768,24 +1016,29 @@ function initIncidentForm() {
     if (APP.map) refreshMapIncidents();
 
     document.getElementById('incidentForm').reset();
-    showToast(`Incident logged: ${inc.type} in ${inc.region}`, 'warning', '🚨');
+    showToast(`Incident logged: ${inc.type} in ${region}, ${country}`, 'warning', '🚨');
   });
 
-  document.getElementById('filterSeverity').addEventListener('change', renderIncidents);
-  document.getElementById('filterRegion').addEventListener('change', renderIncidents);
+  ['filterSeverity','filterContry','filterContinent'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', renderIncidents);
+  });
 }
+
 
 function renderIncidents() {
   const list  = document.getElementById('incidentList');
   const empty = document.getElementById('incidentEmpty');
   const total = document.getElementById('incidentTotal');
 
-  const sevFilter = document.getElementById('filterSeverity').value;
-  const regFilter = document.getElementById('filterRegion').value;
+  const sevFilter  = document.getElementById('filterSeverity')?.value  || 'all';
+  const ctyFilter  = document.getElementById('filterContry')?.value    || 'all';
+  const contFilter = document.getElementById('filterContinent')?.value  || 'all';
 
-  let filtered = APP.incidents;
-  if (sevFilter !== 'all') filtered = filtered.filter(i => i.severity === sevFilter);
-  if (regFilter !== 'all') filtered = filtered.filter(i => i.region === regFilter);
+  let filtered = APP.incidents || [];
+  if (sevFilter  !== 'all') filtered = filtered.filter(i => i.severity  === sevFilter);
+  if (ctyFilter  !== 'all') filtered = filtered.filter(i => i.country   === ctyFilter);
+  if (contFilter !== 'all') filtered = filtered.filter(i => i.continent === contFilter);
 
   total.textContent = filtered.length;
 
@@ -805,10 +1058,11 @@ function renderIncidents() {
     const ts = new Date(inc.timestamp);
     div.innerHTML = `
       <div class="incident-top">
-        <span class="incident-type">${inc.type}</span>
+        <span class="incident-type">${inc.flag || ''} ${inc.type}</span>
         <span class="sev-pill ${inc.severity}">${inc.severity}</span>
       </div>
       <div class="incident-meta">
+        <span>🇿 ${inc.country || '—'}</span>
         <span>📍 ${inc.region}</span>
         <span>⏱ ${formatDate(ts)}</span>
         ${inc.casualties > 0 ? `<span>💀 ${inc.casualties}</span>` : ''}
@@ -824,11 +1078,11 @@ function openIncidentModal(id) {
   const inc = APP.incidents.find(i => i.id === id);
   if (!inc) return;
   APP.currentModalId = id;
-
   document.getElementById('modalTitle').textContent = `${inc.type} — ${inc.severity}`;
   document.getElementById('modalBody').innerHTML = `
     <div class="modal-detail"><label>Type</label><p>${inc.type}</p></div>
-    <div class="modal-detail"><label>Region</label><p>${inc.region}</p></div>
+    <div class="modal-detail"><label>Country</label><p>${inc.flag || ''} ${inc.country || '—'}</p></div>
+    <div class="modal-detail"><label>City / Region</label><p>${inc.region}</p></div>
     <div class="modal-detail"><label>Severity</label><p><span class="sev-pill ${inc.severity}">${inc.severity}</span></p></div>
     <div class="modal-detail"><label>Status</label><p><span class="incident-status ${inc.status}">${inc.status}</span></p></div>
     <div class="modal-detail"><label>Casualties</label><p>${inc.casualties}</p></div>
@@ -836,9 +1090,9 @@ function openIncidentModal(id) {
     <div class="modal-detail"><label>Time</label><p>${formatDate(new Date(inc.timestamp))}</p></div>
     ${inc.notes ? `<div class="modal-detail"><label>Notes</label><p>${inc.notes}</p></div>` : ''}
   `;
-
   document.getElementById('incidentModal').classList.add('open');
 }
+
 
 function initIncidentModal() {
   document.getElementById('modalClose').addEventListener('click', () => {
@@ -884,21 +1138,22 @@ function initShelterForm() {
     e.preventDefault();
     const cap = Number(document.getElementById('shelCapacity').value);
     const occ = Number(document.getElementById('shelOccupancy').value);
+    if (occ > cap) { showToast('Occupancy cannot exceed capacity', 'error'); return; }
 
-    if (occ > cap) {
-      showToast('Occupancy cannot exceed capacity', 'error');
-      return;
-    }
-
+    const country = document.getElementById('shelCountry').value;
+    const wc      = WORLD_COUNTRIES.find(c => c.name === country);
     const shelter = {
-      id: uuid(),
-      name: document.getElementById('shelName').value,
-      region: document.getElementById('shelRegion').value,
-      capacity: cap,
+      id:        uuid(),
+      name:      document.getElementById('shelName').value,
+      country,
+      city:      document.getElementById('shelCity').value,
+      continent: wc ? wc.continent : '',
+      flag:      wc ? wc.flag      : '🏳️',
+      capacity:  cap,
       occupancy: occ,
-      water: document.getElementById('shelWater').value,
-      medical: document.getElementById('shelMedical').value,
-      contact: document.getElementById('shelContact').value,
+      water:     document.getElementById('shelWater').value,
+      medical:   document.getElementById('shelMedical').value,
+      contact:   document.getElementById('shelContact').value,
       timestamp: new Date().toISOString()
     };
 
@@ -907,11 +1162,14 @@ function initShelterForm() {
     renderShelters();
     updateDashboardStats();
     if (APP.map) refreshMapShelters();
-
     document.getElementById('shelterForm').reset();
-    showToast(`Shelter "${shelter.name}" registered`, 'success', '🏥');
+    showToast(`Shelter registered: ${shelter.name} in ${shelter.city}, ${shelter.country}`, 'success', '🏥');
   });
+
+  const fsc = document.getElementById('filterShelterCountry');
+  if (fsc) fsc.addEventListener('change', renderShelters);
 }
+
 
 function renderShelters() {
   const list    = document.getElementById('shelterList');
@@ -920,10 +1178,15 @@ function renderShelters() {
   const capText = document.getElementById('overallCapText');
   const capBar  = document.getElementById('overallCapBar');
 
-  total.textContent = APP.shelters.length;
+  const ctyFilter = document.getElementById('filterShelterCountry')?.value || 'all';
+  const displayed = ctyFilter !== 'all'
+    ? APP.shelters.filter(s => s.country === ctyFilter)
+    : APP.shelters;
 
-  const totalCap = APP.shelters.reduce((a, s) => a + Number(s.capacity), 0);
-  const totalOcc = APP.shelters.reduce((a, s) => a + Number(s.occupancy), 0);
+  total.textContent = displayed.length;
+
+  const totalCap = displayed.reduce((a, s) => a + Number(s.capacity), 0);
+  const totalOcc = displayed.reduce((a, s) => a + Number(s.occupancy), 0);
   const pct = totalCap ? Math.round(totalOcc / totalCap * 100) : 0;
   capText.textContent = `${totalOcc.toLocaleString()} / ${totalCap.toLocaleString()} total occupancy (${pct}%)`;
   capBar.style.width = pct + '%';
@@ -931,25 +1194,21 @@ function renderShelters() {
 
   list.querySelectorAll('.shelter-card').forEach(el => el.remove());
 
-  if (APP.shelters.length === 0) {
-    empty.style.display = 'block';
-    return;
-  }
+  if (displayed.length === 0) { empty.style.display = 'block'; return; }
   empty.style.display = 'none';
 
-  APP.shelters.forEach(s => {
+  displayed.forEach(s => {
     const cap = Number(s.capacity);
     const occ = Number(s.occupancy);
     const pct = cap ? Math.round(occ / cap * 100) : 0;
     const capClass = pct > 80 ? 'cap-high' : pct > 60 ? 'cap-medium' : 'cap-low';
-
     const div = document.createElement('div');
     div.className = `shelter-card ${capClass}`;
     div.innerHTML = `
       <div class="shelter-top">
         <div>
-          <div class="shelter-name">${s.name}</div>
-          <div class="shelter-region">📍 ${s.region}</div>
+          <div class="shelter-name">${s.flag || ''} ${s.name}</div>
+          <div class="shelter-region">🇿 ${s.country} &middot; 📍 ${s.city || s.region || '—'}</div>
         </div>
         <button class="shelter-delete" data-id="${s.id}" title="Remove shelter">✕</button>
       </div>
@@ -969,9 +1228,7 @@ function renderShelters() {
     div.querySelector('.shelter-delete').addEventListener('click', e => {
       e.stopPropagation();
       APP.shelters = APP.shelters.filter(sh => sh.id !== s.id);
-      saveData();
-      renderShelters();
-      updateDashboardStats();
+      saveData(); renderShelters(); updateDashboardStats();
       if (APP.map) refreshMapShelters();
       showToast(`Shelter "${s.name}" removed`, 'info');
     });
@@ -979,18 +1236,17 @@ function renderShelters() {
   });
 }
 
+
 // ══════════════════════════════════════════════════════════════
 //  REPORT GENERATOR
 // ══════════════════════════════════════════════════════════════
 
 function initReportGenerator() {
-  // Set default dates
-  const today = formatDateISO();
+  const today   = formatDateISO();
   const weekAgo = formatDateISO(new Date(Date.now() - 7 * 86400000));
   document.getElementById('rptDateFrom').value = weekAgo;
   document.getElementById('rptDateTo').value   = today;
 
-  // Report type selector
   document.querySelectorAll('.report-type-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.report-type-btn').forEach(b => b.classList.remove('active'));
@@ -999,32 +1255,77 @@ function initReportGenerator() {
     });
   });
 
+  // Scope selector
+  document.querySelectorAll('.scope-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.scope-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const scope = btn.dataset.scope;
+      document.getElementById('rptContinentGroup').style.display = scope === 'continent' ? 'block' : 'none';
+      document.getElementById('rptCountryGroup').style.display   = scope === 'country'   ? 'block' : 'none';
+    });
+  });
+
   document.getElementById('generateReportBtn').addEventListener('click', generateReportPreview);
   document.getElementById('exportPdfBtn').addEventListener('click', exportPdf);
   document.getElementById('printBtn').addEventListener('click', () => window.print());
 }
 
+
 function generateReportPreview() {
   const from    = document.getElementById('rptDateFrom').value;
   const to      = document.getElementById('rptDateTo').value;
-  const region  = document.getElementById('rptRegion').value;
   const author  = document.getElementById('rptAuthor').value || 'El Niño Emergency Operations Center';
   const notes   = document.getElementById('rptNotes').value;
   const type    = APP.reportType;
   const now     = new Date();
 
+  // Retrieve active scope
+  const activeScopeBtn = document.querySelector('.scope-btn.active');
+  const scope = activeScopeBtn ? activeScopeBtn.dataset.scope : 'global';
+
+  let scopeCountries = [...WORLD_COUNTRIES];
+  let scopeTitle = 'Global Operations';
+
+  if (scope === 'continent') {
+    const contVal = document.getElementById('rptContinent').value;
+    if (contVal !== 'all') {
+      scopeCountries = WORLD_COUNTRIES.filter(c => c.continent === contVal);
+      scopeTitle = `${contVal} Continent`;
+    } else {
+      scopeTitle = 'All Continents';
+    }
+  } else if (scope === 'country') {
+    const countryVal = document.getElementById('rptRegion').value;
+    if (countryVal !== 'all') {
+      scopeCountries = WORLD_COUNTRIES.filter(c => c.name === countryVal);
+      const cObj = WORLD_COUNTRIES.find(c => c.name === countryVal);
+      scopeTitle = cObj ? `${cObj.flag} ${cObj.name}` : countryVal;
+    } else {
+      scopeTitle = 'All Countries';
+    }
+  }
+
+  const countryNames = scopeCountries.map(c => c.name);
+
+  // Filter incidents
   const filteredIncidents = APP.incidents.filter(i => {
     const d = i.timestamp.split('T')[0];
     const inDate = (!from || d >= from) && (!to || d <= to);
-    const inRegion = region === 'all' || i.region === region;
-    return inDate && inRegion;
+    const inScope = scope === 'global' || countryNames.includes(i.country);
+    return inDate && inScope;
   });
 
+  // Filter shelters
   const filteredShelters = APP.shelters.filter(s => {
-    return region === 'all' || s.region === region;
+    return scope === 'global' || countryNames.includes(s.country);
   });
 
-  const activeInc   = filteredIncidents.filter(i => i.status === 'Active').length;
+  // Aggregate stats
+  const peakTemp = scopeCountries.reduce((max, c) => c.peakTemp > max ? c.peakTemp : max, 0);
+  const totalBaseDeaths = scopeCountries.reduce((sum, c) => sum + c.deaths, 0);
+  const totalBaseHosp = scopeCountries.reduce((sum, c) => sum + c.hosp, 0);
+  const activeInc = filteredIncidents.filter(i => i.status === 'Active').length;
   const resolvedInc = filteredIncidents.filter(i => i.status === 'Resolved').length;
   const criticalInc = filteredIncidents.filter(i => i.severity === 'Critical').length;
   const totalCasualties = filteredIncidents.reduce((a, i) => a + i.casualties, 0);
@@ -1032,7 +1333,6 @@ function generateReportPreview() {
   const totalShelterOcc = filteredShelters.reduce((a, s) => a + Number(s.occupancy), 0);
   const shelterPct = totalShelterCap ? Math.round(totalShelterOcc / totalShelterCap * 100) : 0;
 
-  const regionStr = region === 'all' ? 'All Regions' : region;
   const reportTitles = {
     executive: 'Executive Summary Report',
     field: 'Field Operations Report',
@@ -1044,7 +1344,7 @@ function generateReportPreview() {
       <span class="rpt-logo">El Niño</span>
       <h1>${reportTitles[type]}</h1>
       <div class="rpt-meta">
-        Heat Wave El Niño — ${regionStr}<br>
+        Heat Wave El Niño — Scope: <strong>${scopeTitle}</strong><br>
         Period: ${from || 'N/A'} to ${to || 'N/A'} &nbsp;|&nbsp;
         Generated: ${formatDate(now)}<br>
         Prepared by: <strong>${author}</strong>
@@ -1056,24 +1356,24 @@ function generateReportPreview() {
     html += `
       <div class="rpt-section">
         <h2>Situation Overview</h2>
-        <p>Heat Wave El Niño continues to impact ${regionStr} with peak temperatures reaching <strong>48.7°C</strong> in Zone A–Ardena. This event is classified as <strong>EXTREME</strong> and poses severe risk to public health and critical infrastructure.</p>
+        <p>Heat Wave El Niño continues to impact <strong>${scopeTitle}</strong> with extreme temperatures reaching peak levels of <strong>${peakTemp}°C</strong>. Responders are tracking multiple severe incidents and managing emergency shelters.</p>
         <div class="rpt-stat-row">
-          <div class="rpt-stat-box"><span class="val">48.7°C</span><span class="lbl">Peak Temp</span></div>
-          <div class="rpt-stat-box"><span class="val">7</span><span class="lbl">Affected Zones</span></div>
-          <div class="rpt-stat-box"><span class="val">12</span><span class="lbl">Fatalities</span></div>
-          <div class="rpt-stat-box"><span class="val">347</span><span class="lbl">Hospitalized</span></div>
+          <div class="rpt-stat-box"><span class="val">${peakTemp}°C</span><span class="lbl">Peak Temp</span></div>
+          <div class="rpt-stat-box"><span class="val">${scopeCountries.length}</span><span class="lbl">Affected Countries</span></div>
+          <div class="rpt-stat-box"><span class="val">${(totalBaseDeaths + totalCasualties).toLocaleString()}</span><span class="lbl">Total Deaths</span></div>
+          <div class="rpt-stat-box"><span class="val">${(totalBaseHosp).toLocaleString()}</span><span class="lbl">Hospitalised</span></div>
           <div class="rpt-stat-box"><span class="val">${filteredIncidents.length}</span><span class="lbl">Total Incidents</span></div>
-          <div class="rpt-stat-box"><span class="val">${totalCasualties}</span><span class="lbl">Casualties</span></div>
+          <div class="rpt-stat-box"><span class="val">${totalCasualties}</span><span class="lbl">Incident Casualties</span></div>
         </div>
       </div>
 
       <div class="rpt-section">
-        <h2>Risk Zone Summary</h2>
+        <h2>Affected Area Summary (Top 10 Hottest)</h2>
         <table class="rpt-table">
-          <thead><tr><th>Region</th><th>Temp (°C)</th><th>Humidity</th><th>Population</th><th>Risk</th></tr></thead>
+          <thead><tr><th>Country</th><th>Continent</th><th>Peak Temp</th><th>Humidity</th><th>Alert Level</th><th>Risk Level</th></tr></thead>
           <tbody>
-            ${REGIONS.filter(r => region === 'all' || r.name === region).map(r =>
-              `<tr><td>${r.name}</td><td>${r.temp}°C</td><td>${r.humidity}%</td><td>${r.population}</td><td>${r.risk.toUpperCase()}</td></tr>`
+            ${scopeCountries.sort((a,b) => b.peakTemp - a.peakTemp).slice(0, 10).map(c =>
+              `<tr><td>${c.flag} ${c.name}</td><td>${c.continent}</td><td>${c.peakTemp}°C</td><td>${c.humidity}%</td><td>${c.alertStatus}</td><td>${c.riskLevel.toUpperCase()}</td></tr>`
             ).join('')}
           </tbody>
         </table>
@@ -1084,12 +1384,11 @@ function generateReportPreview() {
         <p>Total Incidents: <strong>${filteredIncidents.length}</strong> | Active: <strong>${activeInc}</strong> | Resolved: <strong>${resolvedInc}</strong> | Critical: <strong>${criticalInc}</strong></p>
         ${filteredIncidents.length > 0 ? `
         <table class="rpt-table">
-          <thead><tr><th>Type</th><th>Region</th><th>Severity</th><th>Status</th><th>Casualties</th><th>Time</th></tr></thead>
+          <thead><tr><th>Type</th><th>Country</th><th>Region</th><th>Severity</th><th>Status</th><th>Casualties</th></tr></thead>
           <tbody>
             ${filteredIncidents.slice(0, 10).map(i =>
-              `<tr><td>${i.type}</td><td>${i.region}</td><td>${i.severity}</td><td>${i.status}</td><td>${i.casualties}</td><td>${formatDate(new Date(i.timestamp))}</td></tr>`
+              `<tr><td>${i.type}</td><td>${i.country}</td><td>${i.region}</td><td>${i.severity}</td><td>${i.status}</td><td>${i.casualties}</td></tr>`
             ).join('')}
-            ${filteredIncidents.length > 10 ? `<tr><td colspan="6" style="text-align:center;color:#999">... and ${filteredIncidents.length - 10} more incidents</td></tr>` : ''}
           </tbody>
         </table>` : '<p style="color:#999">No incidents logged for this period.</p>'}
       </div>
@@ -1099,13 +1398,13 @@ function generateReportPreview() {
         ${filteredShelters.length > 0 ? `
         <p>Total Shelters: <strong>${filteredShelters.length}</strong> | Overall Occupancy: <strong>${totalShelterOcc.toLocaleString()} / ${totalShelterCap.toLocaleString()} (${shelterPct}%)</strong></p>
         <table class="rpt-table">
-          <thead><tr><th>Shelter</th><th>Region</th><th>Occupancy</th><th>Water</th><th>Medical</th></tr></thead>
+          <thead><tr><th>Shelter</th><th>Country</th><th>City</th><th>Occupancy</th><th>Resources</th></tr></thead>
           <tbody>
             ${filteredShelters.map(s =>
-              `<tr><td>${s.name}</td><td>${s.region}</td><td>${s.occupancy}/${s.capacity} (${Math.round(Number(s.occupancy)/Number(s.capacity)*100)}%)</td><td>${s.water}</td><td>${s.medical}</td></tr>`
+              `<tr><td>${s.name}</td><td>${s.country}</td><td>${s.city || '—'}</td><td>${s.occupancy}/${s.capacity} (${Math.round(Number(s.occupancy)/Number(s.capacity)*100)}%)</td><td>Water: ${s.water} | Medical: ${s.medical}</td></tr>`
             ).join('')}
           </tbody>
-        </table>` : '<p style="color:#999">No shelters registered for this region.</p>'}
+        </table>` : '<p style="color:#999">No shelters registered in this scope.</p>'}
       </div>
 
       ${notes ? `<div class="rpt-section"><h2>Additional Notes</h2><p>${notes}</p></div>` : ''}
@@ -1113,11 +1412,9 @@ function generateReportPreview() {
       <div class="rpt-section">
         <h2>Key Recommendations</h2>
         <ol>
-          <li>Immediately enforce mandatory evacuation in Zones A and D (temperatures exceeding 47°C).</li>
-          <li>Increase shelter capacity in high-density zones — current utilization at ${shelterPct}%.</li>
-          <li>Deploy additional medical personnel to Zones A, B, and D.</li>
-          <li>Issue public cooling center locations via all media channels.</li>
-          <li>Coordinate water distribution to all affected zones by 06:00 daily.</li>
+          <li>Immediately enforce alert protocols in extreme heat areas (exceeding 48°C).</li>
+          <li>Deploy additional cooling assets to countries with high shelter occupancy.</li>
+          <li>Maintain close communication with regional field command posts.</li>
         </ol>
       </div>
     `;
@@ -1125,18 +1422,18 @@ function generateReportPreview() {
     html += `
       <div class="rpt-section">
         <h2>Field Operations Status</h2>
-        <p><strong>Operational Period:</strong> ${from} to ${to} | <strong>AO:</strong> ${regionStr}</p>
-        <p>This report provides field-level intelligence for emergency responders operating within the El Niño heat wave event zone.</p>
+        <p><strong>Operational Period:</strong> ${from || 'N/A'} to ${to || 'N/A'} | <strong>Scope:</strong> ${scopeTitle}</p>
+        <p>This report provides field-level intelligence for emergency responders operating within the designated El Niño event boundaries.</p>
       </div>
 
       <div class="rpt-section">
         <h2>Active Incidents (${activeInc})</h2>
         ${filteredIncidents.filter(i => i.status === 'Active').length > 0 ? `
         <table class="rpt-table">
-          <thead><tr><th>ID</th><th>Type</th><th>Region</th><th>Severity</th><th>Casualties</th><th>Reporter</th><th>Notes</th></tr></thead>
+          <thead><tr><th>Type</th><th>Country</th><th>City / Region</th><th>Severity</th><th>Casualties</th><th>Reporter</th><th>Notes</th></tr></thead>
           <tbody>
             ${filteredIncidents.filter(i => i.status === 'Active').map(i =>
-              `<tr><td style="font-size:10px">${i.id}</td><td>${i.type}</td><td>${i.region}</td><td>${i.severity}</td><td>${i.casualties}</td><td>${i.reporter||'—'}</td><td>${i.notes||'—'}</td></tr>`
+              `<tr><td>${i.type}</td><td>${i.country}</td><td>${i.region}</td><td>${i.severity}</td><td>${i.casualties}</td><td>${i.reporter||'—'}</td><td>${i.notes||'—'}</td></tr>`
             ).join('')}
           </tbody>
         </table>` : '<p style="color:#999">No active incidents.</p>'}
@@ -1146,38 +1443,118 @@ function generateReportPreview() {
         <h2>Shelter Locations & Capacity</h2>
         ${filteredShelters.length > 0 ? `
         <table class="rpt-table">
-          <thead><tr><th>Shelter</th><th>Region</th><th>Capacity</th><th>Occupancy</th><th>Water</th><th>Medical</th><th>Contact</th></tr></thead>
+          <thead><tr><th>Shelter</th><th>Country</th><th>City</th><th>Capacity</th><th>Occupancy</th><th>Contact</th></tr></thead>
           <tbody>
             ${filteredShelters.map(s =>
-              `<tr><td>${s.name}</td><td>${s.region}</td><td>${s.capacity}</td><td>${s.occupancy}</td><td>${s.water}</td><td>${s.medical}</td><td>${s.contact||'—'}</td></tr>`
+              `<tr><td>${s.name}</td><td>${s.country}</td><td>${s.city || '—'}</td><td>${s.capacity}</td><td>${s.occupancy}</td><td>${s.contact||'—'}</td></tr>`
             ).join('')}
           </tbody>
-        </table>` : '<p style="color:#999">No shelters in this area.</p>'}
+        </table>` : '<p style="color:#999">No shelters registered in this area.</p>'}
       </div>
 
+      ${notes ? `<div class="rpt-section"><h2>Commander's Notes</h2><p>${notes}</p></div>` : ''}
+    `;
+  } else if (type === 'integration') {
+    html += `
       <div class="rpt-section">
-        <h2>Danger Zone Temperatures</h2>
+        <h2>Recommended Data Stack for Selected Scope: ${scopeTitle}</h2>
+        <p>To implement live monitoring, forecasting, and historical climate analytics for El Niño dashboards, we recommend the following target data stack for dashboard integration:</p>
         <table class="rpt-table">
-          <thead><tr><th>Zone</th><th>Temp</th><th>Humidity</th><th>Risk</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Data Layer</th>
+              <th>Recommended Source</th>
+              <th>Coverage & Type</th>
+            </tr>
+          </thead>
           <tbody>
-            ${REGIONS.filter(r => region === 'all' || r.name === region)
-              .filter(r => r.risk === 'extreme' || r.risk === 'high')
-              .map(r => `<tr><td>${r.name}</td><td><strong>${r.temp}°C</strong></td><td>${r.humidity}%</td><td>${r.risk.toUpperCase()}</td></tr>`).join('')}
+            <tr><td><strong>Live Weather</strong></td><td>OpenWeatherMap + Open-Meteo</td><td>Current conditions & hourly parameters</td></tr>
+            <tr><td><strong>7–16 Day Forecast</strong></td><td>Open-Meteo API</td><td>High resolution global model forecasts</td></tr>
+            <tr><td><strong>Historical Weather</strong></td><td>Visual Crossing Weather API</td><td>Long-term historical climate records</td></tr>
+            <tr><td><strong>El Niño / ENSO</strong></td><td>NOAA Climate.gov + Columbia IRI</td><td>Sea surface temp anomalies, ONI index</td></tr>
+            <tr><td><strong>Climate Reanalysis</strong></td><td>Copernicus Climate Data Store (ERA5) + NASA POWER</td><td>ERA5 hourly dataset & solar parameters</td></tr>
+            <tr><td><strong>Satellite Imagery</strong></td><td>NASA EarthData + Sentinel Hub</td><td>Atmospheric observations & satellite layers</td></tr>
+            <tr><td><strong>Air Quality</strong></td><td>OpenAQ + WAQI</td><td>Global particulate and gas indices</td></tr>
+            <tr><td><strong>Disaster Data</strong></td><td>EM-DAT + GDACS</td><td>Historical disasters & real-time global hazard alerts</td></tr>
+            <tr><td><strong>Geographic Boundaries</strong></td><td>Natural Earth + GADM + GeoBoundaries</td><td>Administrative shapes and border paths</td></tr>
           </tbody>
         </table>
       </div>
 
-      ${notes ? `<div class="rpt-section"><h2>Commander's Notes</h2><p>${notes}</p></div>` : ''}
+      <div class="rpt-section" style="overflow-x:auto;">
+        <h2>Global Weather API Evaluation</h2>
+        <table class="rpt-table" style="font-size: 11px;">
+          <thead>
+            <tr>
+              <th>API Website</th>
+              <th>Coverage</th>
+              <th>Live</th>
+              <th>Forecast</th>
+              <th>Historical</th>
+              <th>Free Tier</th>
+              <th>Best For</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>OpenWeatherMap API</strong></td><td>200+ countries</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Paid</td><td>✅ Yes</td><td>Current weather, forecasts, global alerts</td></tr>
+            <tr><td><strong>Open-Meteo API</strong></td><td>Global</td><td>✅ Yes</td><td>✅ 16-Day</td><td>✅ Yes</td><td>✅ Yes</td><td>Free weather, archive and forecast API</td></tr>
+            <tr><td><strong>Visual Crossing</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td><td>Historical records, forecasts, and raw feeds</td></tr>
+            <tr><td><strong>Tomorrow.io</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>⚠️ Limited</td><td>✅ Yes</td><td>Enterprise-quality climate intelligence</td></tr>
+            <tr><td><strong>WeatherAPI.com</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>⚠️ Limited</td><td>✅ Yes</td><td>Quick integration, direct BI connector</td></tr>
+            <tr><td><strong>Meteomatics API</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td><td>⚠️ Trial</td><td>High-resolution scientific grid data</td></tr>
+            <tr><td><strong>AccuWeather APIs</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>⚠️ Limited</td><td>⚠️ Limited</td><td>Commercial products & consumer applications</td></tr>
+            <tr><td><strong>Weatherbit API</strong></td><td>Global</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td><td>✅ Yes</td><td>Fast forecasts & historical queries</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rpt-section">
+        <h2>Global Climate, Satellite & Environmental Source Catalogue</h2>
+        <table class="rpt-table" style="font-size: 11px;">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Data Source Website</th>
+              <th>Parameters & Availability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Global Climate</strong></td><td>NOAA Climate.gov / NCEI</td><td>ENSO indices, Sea Surface Temp (SST) anomalies, climate observations</td></tr>
+            <tr><td><strong>Climate Reanalysis</strong></td><td>Copernicus Climate Data Store</td><td>ERA5 weather reanalysis datasets, temperature, wind patterns</td></tr>
+            <tr><td><strong>Solar & Energy</strong></td><td>NASA POWER API</td><td>Temperature, relative humidity, wind speed, solar radiation grids</td></tr>
+            <tr><td><strong>Satellite Earth Observation</strong></td><td>NASA EarthData / Sentinel Hub</td><td>Atmospheric variables, remote sensing, satellite images</td></tr>
+            <tr><td><strong>Air Quality Monitoring</strong></td><td>OpenAQ / WAQI Index</td><td>Real-time particulate matter (PM2.5, PM10) & gas monitoring</td></tr>
+            <tr><td><strong>Disasters & Hazards</strong></td><td>EM-DAT / GDACS / ReliefWeb</td><td>Real-time hazard notifications, global disaster reports, damage estimates</td></tr>
+            <tr><td><strong>Administrative Boundaries</strong></td><td>Natural Earth / GADM / GeoBoundaries</td><td>Administrative shapefiles and border boundaries for GIS modeling</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="rpt-section">
+        <h2>Technical Implementation Plan for Tableau Dashboard</h2>
+        <ol>
+          <li><strong>Data Ingestion & Refreshing:</strong> Create an ETL pipeline using Python (Pandas/Requests) to pull current metrics from <strong>OpenWeatherMap / Open-Meteo</strong>. Save as a refreshed CSV or push to an SQL database (PostgreSQL/BigQuery).</li>
+          <li><strong>Tableau Connector Options:</strong>
+            <ul>
+              <li><strong>Web Data Connector (WDC):</strong> Directly connect Tableau to the OpenWeatherMap or WAQI REST APIs.</li>
+              <li><strong>Tableau Prep Flow:</strong> Automate queries to Visual Crossing and NOAA's ENSO FTP files to pre-aggregate historical temperature trends.</li>
+            </ul>
+          </li>
+          <li><strong>Geographic Mapping:</strong> Join <strong>GADM country shapes</strong> with your live dashboard feed on Country Code to map risk index levels globally.</li>
+        </ol>
+      </div>
+
+      ${notes ? `<div class="rpt-section"><h2>Integration Notes</h2><p>${notes}</p></div>` : ''}
     `;
   } else {
     // Public bulletin
     html += `
       <div class="rpt-section">
         <h2>⚠️ Public Safety Advisory</h2>
-        <p><strong>EXTREME HEAT WARNING</strong> in effect for ${regionStr}. Heat Wave El Niño is producing dangerous temperatures. All residents are urged to take immediate precautions.</p>
+        <p><strong>EXTREME HEAT WARNING</strong> in effect for <strong>${scopeTitle}</strong>. Heat Wave El Niño is producing dangerous temperatures. All residents are urged to take immediate precautions.</p>
         <div class="rpt-stat-row">
-          <div class="rpt-stat-box"><span class="val">48.7°C</span><span class="lbl">Max Temp Today</span></div>
-          <div class="rpt-stat-box"><span class="val">7</span><span class="lbl">Zones Affected</span></div>
+          <div class="rpt-stat-box"><span class="val">${peakTemp}°C</span><span class="lbl">Max Temp Today</span></div>
+          <div class="rpt-stat-box"><span class="val">${scopeCountries.length}</span><span class="lbl">Countries Affected</span></div>
           <div class="rpt-stat-box"><span class="val">${filteredShelters.length}</span><span class="lbl">Cooling Centers</span></div>
         </div>
       </div>
@@ -1186,12 +1563,12 @@ function generateReportPreview() {
         <h2>🏥 Cooling Center Locations</h2>
         ${filteredShelters.length > 0 ? `
         <table class="rpt-table">
-          <thead><tr><th>Name</th><th>Area</th><th>Availability</th><th>Contact</th></tr></thead>
+          <thead><tr><th>Name</th><th>Country</th><th>City</th><th>Availability</th><th>Contact</th></tr></thead>
           <tbody>
             ${filteredShelters.map(s => {
               const pct = Math.round(Number(s.occupancy)/Number(s.capacity)*100);
               const avail = pct < 60 ? '✅ Open' : pct < 90 ? '⚠️ Limited' : '❌ Full';
-              return `<tr><td>${s.name}</td><td>${s.region}</td><td>${avail}</td><td>${s.contact||'—'}</td></tr>`;
+              return `<tr><td>${s.name}</td><td>${s.country}</td><td>${s.city || '—'}</td><td>${avail}</td><td>${s.contact||'—'}</td></tr>`;
             }).join('')}
           </tbody>
         </table>` : '<p style="color:#999">No cooling centers currently registered in this area.</p>'}
@@ -1205,17 +1582,8 @@ function generateReportPreview() {
           <li><strong>Avoid outdoor exercise</strong> or strenuous activity in the heat.</li>
           <li><strong>Check on vulnerable neighbors</strong> — elderly, children, and those with chronic illness.</li>
           <li><strong>Use cooling centers</strong> — listed above, open 24 hours.</li>
-          <li><strong>Emergency: Call 112</strong> for medical emergencies related to heat.</li>
         </ol>
       </div>
-
-      <div class="rpt-section">
-        <h2>🌡️ What to Watch For</h2>
-        <p><strong>Heatstroke symptoms:</strong> High body temperature, confusion, loss of consciousness, dry skin. Call emergency services immediately.</p>
-        <p><strong>Heat exhaustion:</strong> Heavy sweating, weakness, cold/pale skin, nausea. Move to cool area and hydrate.</p>
-      </div>
-
-      ${notes ? `<div class="rpt-section"><h2>Additional Information</h2><p>${notes}</p></div>` : ''}
     `;
   }
 
@@ -1255,7 +1623,12 @@ function exportPdf() {
   doc.setFontSize(18);
   doc.text('El Niño', margin, 12);
   doc.setFontSize(11);
-  const titles = { executive: 'Executive Summary Report', field: 'Field Operations Report', public: 'Public Information Bulletin' };
+  const titles = { 
+    executive: 'Executive Summary Report', 
+    field: 'Field Operations Report', 
+    public: 'Public Information Bulletin',
+    integration: 'Data Stack Integration Plan'
+  };
   doc.text(titles[APP.reportType] || 'Heat Wave Report', margin, 20);
 
   // Meta
@@ -1274,117 +1647,248 @@ function exportPdf() {
   doc.text(`Region: ${regionStr}  |  Period: ${document.getElementById('rptDateFrom').value} to ${document.getElementById('rptDateTo').value}`, margin, yPos);
   yPos += 10;
 
-  // Key Stats
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(255, 107, 53);
-  doc.text('KEY STATISTICS', margin, yPos);
-  yPos += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(30, 30, 30);
-
-  const stats = [
-    ['Peak Temperature', '48.7°C'],
-    ['Affected Regions', '7'],
-    ['Total Incidents', APP.incidents.length.toString()],
-    ['Active Incidents', APP.incidents.filter(i => i.status === 'Active').length.toString()],
-    ['Confirmed Fatalities', '12'],
-    ['Hospitalized', '347'],
-    ['Registered Shelters', APP.shelters.length.toString()],
-  ];
-
-  stats.forEach(([label, val]) => {
-    checkPage(7);
-    doc.text(`• ${label}: ${val}`, margin + 4, yPos);
-    yPos += 6;
-  });
-
-  yPos += 4;
-
-  // Regional risk table
-  checkPage(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(255, 107, 53);
-  doc.text('REGIONAL RISK SUMMARY', margin, yPos);
-  yPos += 6;
-
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(30, 30, 30);
-
-  REGIONS.filter(r => region === 'all' || r.name === region).forEach(r => {
-    checkPage(7);
-    doc.text(`• ${r.name}: ${r.temp}°C | Humidity: ${r.humidity}% | Pop: ${r.population} | Risk: ${r.risk.toUpperCase()}`, margin + 4, yPos);
-    yPos += 6;
-  });
-
-  yPos += 4;
-
-  // Incidents
-  checkPage(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(255, 107, 53);
-  doc.text('INCIDENTS', margin, yPos);
-  yPos += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(30, 30, 30);
-
-  if (APP.incidents.length === 0) {
-    doc.text('No incidents logged.', margin + 4, yPos);
-    yPos += 7;
-  } else {
-    APP.incidents.slice(0, 20).forEach(i => {
-      checkPage(7);
-      doc.text(`• [${i.severity}] ${i.type} — ${i.region} | Status: ${i.status} | Casualties: ${i.casualties}`, margin + 4, yPos);
-      yPos += 6;
-    });
-  }
-
-  yPos += 4;
-
-  // Shelters
-  checkPage(12);
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(11);
-  doc.setTextColor(255, 107, 53);
-  doc.text('SHELTER & RESOURCES', margin, yPos);
-  yPos += 6;
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(9);
-  doc.setTextColor(30, 30, 30);
-
-  if (APP.shelters.length === 0) {
-    doc.text('No shelters registered.', margin + 4, yPos);
-    yPos += 7;
-  } else {
-    APP.shelters.forEach(s => {
-      const pct = Math.round(Number(s.occupancy) / Number(s.capacity) * 100);
-      checkPage(7);
-      doc.text(`• ${s.name} (${s.region}): ${s.occupancy}/${s.capacity} occupied (${pct}%) | Water: ${s.water} | Medical: ${s.medical}`, margin + 4, yPos);
-      yPos += 6;
-    });
-  }
-
-  // Notes
-  const notes = document.getElementById('rptNotes').value;
-  if (notes) {
-    yPos += 4;
+  if (APP.reportType === 'integration') {
+    // ----------------------------------------------------
+    // INTEGRATION REPORT PDF
+    // ----------------------------------------------------
     checkPage(12);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
     doc.setTextColor(255, 107, 53);
-    doc.text('ADDITIONAL NOTES', margin, yPos);
+    doc.text('RECOMMENDED DATA STACK', margin, yPos);
     yPos += 6;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(30, 30, 30);
-    const splitNotes = doc.splitTextToSize(notes, pageW - margin * 2);
-    doc.text(splitNotes, margin + 4, yPos);
-    yPos += splitNotes.length * 5 + 4;
+
+    const stack = [
+      ['Live Weather', 'OpenWeatherMap + Open-Meteo'],
+      ['Forecast (7-16 Days)', 'Open-Meteo API'],
+      ['Historical Weather', 'Visual Crossing API'],
+      ['El Niño / ENSO Index', 'NOAA Climate.gov + Columbia IRI'],
+      ['Climate Reanalysis', 'Copernicus Climate Data Store (ERA5)'],
+      ['Satellite Imagery', 'NASA EarthData + Sentinel Hub'],
+      ['Air Quality Layer', 'OpenAQ + WAQI'],
+      ['Global Disaster alerts', 'EM-DAT + GDACS'],
+      ['Geographic Boundaries', 'Natural Earth + GADM']
+    ];
+    stack.forEach(([layer, source]) => {
+      checkPage(6);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`• ${layer}: `, margin + 4, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(source, margin + 48, yPos);
+      yPos += 5.5;
+    });
+
+    yPos += 5;
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('WEATHER API COMPARISON SUMMARY', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30, 30, 30);
+
+    const weatherApis = [
+      ['OpenWeatherMap', '200+ countries', 'Live/Forecast', 'Paid historical', 'Free Tier: Yes'],
+      ['Open-Meteo API', 'Global coverage', 'Live/16-Day Forecast', 'Full Free archive', 'Free Tier: Yes'],
+      ['Visual Crossing', 'Global coverage', 'Live/Forecast', 'Full history query', 'Free Tier: Yes'],
+      ['Tomorrow.io', 'Global coverage', 'Live/Forecast', 'Limited history', 'Free Tier: Yes'],
+      ['WeatherAPI.com', 'Global coverage', 'Live/Forecast', 'Limited history', 'Free Tier: Yes']
+    ];
+    weatherApis.forEach(([api, cov, query, hist, free]) => {
+      checkPage(6);
+      doc.text(`• ${api} (${cov}) — Data: ${query} | History: ${hist} | ${free}`, margin + 4, yPos);
+      yPos += 5.5;
+    });
+
+    yPos += 5;
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('CLIMATE, OCEAN & DISASTER SOURCES', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30, 30, 30);
+
+    const climates = [
+      ['NOAA Climate.gov', 'ENSO sea surface temperature anomalies & indices'],
+      ['Copernicus ERA5', 'Hourly weather and climate reanalysis grids'],
+      ['NASA POWER API', 'Solar radiation and high-altitude meteorological data'],
+      ['OpenAQ / WAQI', 'Real-time global particulate matter & air pollution'],
+      ['GDACS / EM-DAT', 'Real-time hazard notifications & global disaster history']
+    ];
+    climates.forEach(([source, desc]) => {
+      checkPage(6);
+      doc.setFont('helvetica', 'bold');
+      doc.text(`• ${source}: `, margin + 4, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(desc, margin + 38, yPos);
+      yPos += 5.5;
+    });
+
+    yPos += 5;
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('IMPLEMENTATION & TOOL RECOMMENDATIONS', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(30, 30, 30);
+
+    const steps = [
+      'Write ingestion script (Python/Requests) to fetch OpenWeatherMap or Open-Meteo current condition endpoints.',
+      'Save refreshed JSON/CSV metrics to a server or cloud storage (e.g. S3, SQL DB) to enable live refreshes.',
+      'Use Web Data Connector (WDC) or Tableau Prep to orchestrate periodic fetches and update Tableau dashboards.',
+      'Join Natural Earth or GADM shapefiles on country name or boundary codes to build responsive heatmaps.'
+    ];
+    steps.forEach((step, idx) => {
+      checkPage(10);
+      const splitLines = doc.splitTextToSize(`${idx + 1}. ${step}`, pageW - margin * 2 - 8);
+      doc.text(splitLines, margin + 4, yPos);
+      yPos += splitLines.length * 4.5 + 2;
+    });
+
+    const notes = document.getElementById('rptNotes').value;
+    if (notes) {
+      yPos += 4;
+      checkPage(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 107, 53);
+      doc.text('INTEGRATION NOTES', margin, yPos);
+      yPos += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 30, 30);
+      const splitNotes = doc.splitTextToSize(notes, pageW - margin * 2);
+      doc.text(splitNotes, margin + 4, yPos);
+      yPos += splitNotes.length * 5 + 4;
+    }
+
+  } else {
+    // ----------------------------------------------------
+    // STANDARD REPORT PDF
+    // ----------------------------------------------------
+    // Key Stats
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('KEY STATISTICS', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(30, 30, 30);
+
+    const stats = [
+      ['Peak Temperature', '48.7°C'],
+      ['Affected Regions', '7'],
+      ['Total Incidents', APP.incidents.length.toString()],
+      ['Active Incidents', APP.incidents.filter(i => i.status === 'Active').length.toString()],
+      ['Confirmed Fatalities', '12'],
+      ['Hospitalized', '347'],
+      ['Registered Shelters', APP.shelters.length.toString()],
+    ];
+
+    stats.forEach(([label, val]) => {
+      checkPage(7);
+      doc.text(`• ${label}: ${val}`, margin + 4, yPos);
+      yPos += 6;
+    });
+
+    yPos += 4;
+
+    // Regional risk table
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('REGIONAL RISK SUMMARY', margin, yPos);
+    yPos += 6;
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(30, 30, 30);
+
+    REGIONS.filter(r => region === 'all' || r.name === region).forEach(r => {
+      checkPage(7);
+      doc.text(`• ${r.name}: ${r.temp || r.peakTemp}°C | Humidity: ${r.humidity}% | Pop: ${r.population} | Risk: ${(r.risk || r.riskLevel).toUpperCase()}`, margin + 4, yPos);
+      yPos += 6;
+    });
+
+    yPos += 4;
+
+    // Incidents
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('INCIDENTS', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(30, 30, 30);
+
+    if (APP.incidents.length === 0) {
+      doc.text('No incidents logged.', margin + 4, yPos);
+      yPos += 7;
+    } else {
+      APP.incidents.slice(0, 20).forEach(i => {
+        checkPage(7);
+        doc.text(`• [${i.severity}] ${i.type} — ${i.region} | Status: ${i.status} | Casualties: ${i.casualties}`, margin + 4, yPos);
+        yPos += 6;
+      });
+    }
+
+    yPos += 4;
+
+    // Shelters
+    checkPage(12);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(255, 107, 53);
+    doc.text('SHELTER & RESOURCES', margin, yPos);
+    yPos += 6;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.setTextColor(30, 30, 30);
+
+    if (APP.shelters.length === 0) {
+      doc.text('No shelters registered.', margin + 4, yPos);
+      yPos += 7;
+    } else {
+      APP.shelters.forEach(s => {
+        const pct = Math.round(Number(s.occupancy) / Number(s.capacity) * 100);
+        checkPage(7);
+        doc.text(`• ${s.name} (${s.country || s.region}): ${s.occupancy}/${s.capacity} occupied (${pct}%) | Water: ${s.water} | Medical: ${s.medical}`, margin + 4, yPos);
+        yPos += 6;
+      });
+    }
+
+    // Notes
+    const notes = document.getElementById('rptNotes').value;
+    if (notes) {
+      yPos += 4;
+      checkPage(12);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(255, 107, 53);
+      doc.text('ADDITIONAL NOTES', margin, yPos);
+      yPos += 6;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(9);
+      doc.setTextColor(30, 30, 30);
+      const splitNotes = doc.splitTextToSize(notes, pageW - margin * 2);
+      doc.text(splitNotes, margin + 4, yPos);
+      yPos += splitNotes.length * 5 + 4;
+    }
   }
 
   // Footer on all pages
@@ -1922,12 +2426,18 @@ function init() {
   initSidebar();
   initTabs();
 
+  // Populate all country dropdowns first
+  populateCountryDropdowns();
+  initWorldTableFilters();
+
   chartDefaults();
   initTempChart();
   initHumidityChart();
   initHistoricalChart();
+  initGlobalTempChart();
 
   renderRiskTable();
+  updateWorldRiskStrip();
   renderIncidents();
   renderShelters();
   updateDashboardStats();
@@ -1938,14 +2448,19 @@ function init() {
   initReportGenerator();
   initIndiaModule();
 
-  // Seed some demo incidents if empty
+  // Seed demo incidents with real country data
   if (APP.incidents.length === 0) {
     const demo = [
-      { id: uuid(), type: 'Heatstroke', region: 'Zone A – Ardena',    severity: 'Critical', casualties: 3, reporter: 'Unit Alpha-1', notes: 'Multiple heatstroke victims at central market. Ambulances dispatched.', status: 'Active',    timestamp: new Date(Date.now() - 3600000).toISOString() },
-      { id: uuid(), type: 'Power Outage', region: 'Zone D – Delvar',  severity: 'High',     casualties: 0, reporter: 'Grid Control', notes: 'Major substation failure. ~12,000 households affected.', status: 'Active',    timestamp: new Date(Date.now() - 7200000).toISOString() },
-      { id: uuid(), type: 'Water Shortage', region: 'Zone B – Braxton', severity: 'High',   casualties: 0, reporter: 'Unit Bravo-3', notes: 'Municipal water pressure dropping. Emergency tankers deployed.', status: 'Monitoring', timestamp: new Date(Date.now() - 18000000).toISOString() },
-      { id: uuid(), type: 'Wildfire', region: 'Zone F – Farentino', severity: 'Moderate',   casualties: 0, reporter: 'Fire Brigade', notes: 'Small brush fire 2km north of Route 14. Contained to 3 hectares.', status: 'Resolved', timestamp: new Date(Date.now() - 86400000).toISOString() },
-      { id: uuid(), type: 'Mass Evacuation', region: 'Zone A – Ardena', severity: 'Critical', casualties: 1, reporter: 'Commander Reyes', notes: 'Mandatory evacuation of 3 residential blocks. 420 residents displaced.', status: 'Active', timestamp: new Date(Date.now() - 1800000).toISOString() },
+      { id:uuid(), type:'Heatstroke',     country:'India',        flag:'🇮🇳', continent:'Asia',     region:'Churu, Rajasthan',   severity:'Critical', casualties:8,  reporter:'SDRF Unit-3',     notes:'Mass heatstroke event at bus stand. 8 critical, 42 hospitalised.', status:'Active',    timestamp: new Date(Date.now()-3600000).toISOString() },
+      { id:uuid(), type:'Power Outage',   country:'Iraq',         flag:'🇮🇶', continent:'M.East',   region:'Baghdad, Al-Karkh', severity:'Critical', casualties:0,  reporter:'MOE Baghdad',     notes:'Major substation failure. 280,000 households without power in 44°C heat.', status:'Active', timestamp: new Date(Date.now()-7200000).toISOString() },
+      { id:uuid(), type:'Water Shortage', country:'Kuwait',       flag:'🇰🇼', continent:'M.East',   region:'Kuwait City Centre',severity:'High',     casualties:0,  reporter:'PAEW Kuwait',     notes:'Desalination plant operating at 60% capacity. Emergency rationing in place.', status:'Active', timestamp: new Date(Date.now()-14400000).toISOString() },
+      { id:uuid(), type:'Wildfire',       country:'Spain',        flag:'🇪🇸', continent:'Europe',   region:'Extremadura, Badajoz',severity:'High',   casualties:2,  reporter:'BRIF Team 4',     notes:'Forest fire 1,200ha. 3 villages evacuated. Air tankers deployed.', status:'Active',    timestamp: new Date(Date.now()-10800000).toISOString() },
+      { id:uuid(), type:'Mass Evacuation',country:'Australia',    flag:'🇦🇺', continent:'Oceania',  region:'Broken Hill, NSW',  severity:'Critical', casualties:0,  reporter:'NSW SES',         notes:'Mandatory evacuation of 4,200 residents. Peak temp 49°C.', status:'Active',    timestamp: new Date(Date.now()-1800000).toISOString() },
+      { id:uuid(), type:'Heatstroke',     country:'Pakistan',     flag:'🇵🇰', continent:'Asia',     region:'Jacobabad, Sindh',  severity:'Critical', casualties:12, reporter:'PDMA Sindh',      notes:'12 deaths confirmed. 230 hospitalised. Makeshift cooling centres overwhelmed.', status:'Active', timestamp: new Date(Date.now()-5400000).toISOString() },
+      { id:uuid(), type:'Infrastructure', country:'Egypt',        flag:'🇪🇬', continent:'Africa',   region:'Cairo, Giza District',severity:'High',   casualties:0,  reporter:'Ministry of Utilities',notes:'Road surface buckling on Ring Road. 6km stretch closed.', status:'Monitoring', timestamp: new Date(Date.now()-86400000).toISOString() },
+      { id:uuid(), type:'Heatstroke',     country:'USA',          flag:'🇺🇸', continent:'Americas', region:'Phoenix, Arizona',  severity:'High',     casualties:4,  reporter:'Maricopa EMS',    notes:'4 fatalities reported. Cooling centers at 95% capacity.', status:'Monitoring', timestamp: new Date(Date.now()-43200000).toISOString() },
+      { id:uuid(), type:'Drought',        country:'Morocco',      flag:'🇲🇦', continent:'Africa',   region:'Draa-Tafilalet Region',severity:'Moderate',casualties:0, reporter:'Water Authority',  notes:'Reservoir at 18% capacity. Crop failure estimated 40%. Emergency water airlifts.', status:'Monitoring', timestamp: new Date(Date.now()-172800000).toISOString() },
+      { id:uuid(), type:'Power Outage',   country:'Greece',       flag:'🇬🇷', continent:'Europe',   region:'Athens, Attica',    severity:'Moderate', casualties:0,  reporter:'IPTO Athens',     notes:'Rolling blackouts 4-8pm daily. 2.1M affected.', status:'Resolved', timestamp: new Date(Date.now()-259200000).toISOString() },
     ];
     APP.incidents = demo;
     saveData();
@@ -1953,12 +2468,15 @@ function init() {
     updateDashboardStats();
   }
 
-  // Seed demo shelters if empty
+  // Seed demo shelters with real country data
   if (APP.shelters.length === 0) {
     const demoShelters = [
-      { id: uuid(), name: 'Ardena Community Center', region: 'Zone A – Ardena', capacity: 800, occupancy: 612, water: 'Adequate', medical: 'Present', contact: 'Maria Santos — +1-555-0101', timestamp: new Date().toISOString() },
-      { id: uuid(), name: 'St. Luke School Gymnasium', region: 'Zone B – Braxton', capacity: 500, occupancy: 487, water: 'Limited', medical: 'Limited', contact: 'John Ferraz — +1-555-0202', timestamp: new Date().toISOString() },
-      { id: uuid(), name: 'Delvar Sports Complex', region: 'Zone D – Delvar', capacity: 1200, occupancy: 340, water: 'Adequate', medical: 'Present', contact: 'Ana Lima — +1-555-0303', timestamp: new Date().toISOString() },
+      { id:uuid(), name:'NDRF Cooling Camp — Churu',    country:'India',      flag:'🇮🇳', continent:'Asia',     city:'Churu, Rajasthan',    capacity:1200, occupancy:980,  water:'Adequate',  medical:'Present',  contact:'Col. Arjun Sharma +91-99001-12345', timestamp:new Date().toISOString() },
+      { id:uuid(), name:'Al-Rasheed Relief Centre',     country:'Iraq',       flag:'🇮🇶', continent:'M.East',   city:'Baghdad',             capacity:800,  occupancy:760,  water:'Limited',   medical:'Present',  contact:'UNHCR Baghdad Office',             timestamp:new Date().toISOString() },
+      { id:uuid(), name:'Phoenix Desert Respite Hub',   country:'USA',        flag:'🇺🇸', continent:'Americas', city:'Phoenix, Arizona',    capacity:2000, occupancy:1450, water:'Adequate',  medical:'Present',  contact:'Maricopa County EMS',              timestamp:new Date().toISOString() },
+      { id:uuid(), name:'Riyadh Emergency Cool Zone',   country:'Saudi Arabia',flag:'🇸🇦',continent:'M.East',   city:'Riyadh',              capacity:1500, occupancy:890,  water:'Adequate',  medical:'Limited',  contact:'SCDF Riyadh +966-11-429-5555',     timestamp:new Date().toISOString() },
+      { id:uuid(), name:'Madrid Cooling Network Hub',   country:'Spain',      flag:'🇪🇸', continent:'Europe',   city:'Madrid, Centro',      capacity:600,  occupancy:412,  water:'Adequate',  medical:'Present',  contact:'Cruz Roja Madrid',                 timestamp:new Date().toISOString() },
+      { id:uuid(), name:'Broken Hill Emergency Camp',   country:'Australia',  flag:'🇦🇺', continent:'Oceania',  city:'Broken Hill, NSW',    capacity:900,  occupancy:720,  water:'Adequate',  medical:'Present',  contact:'NSW SES — 132 500',                timestamp:new Date().toISOString() },
     ];
     APP.shelters = demoShelters;
     saveData();
@@ -1968,4 +2486,5 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 

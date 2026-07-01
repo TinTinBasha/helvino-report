@@ -51,10 +51,15 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         <span>Dashboard</span>
       </a>
+      <a href="#" class="nav-item" data-tab="india" id="nav-india">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        <span>India Analysis</span>
+        <span class="nav-badge" style="background:rgba(255,153,51,0.25);color:#FF9933">LIVE</span>
+      </a>
       <a href="#" class="nav-item" data-tab="map" id="nav-map">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
         <span>Risk Zone Map</span>
-        <span class="nav-badge">7</span>
+        <span class="nav-badge" id="mapCountryBadge">50</span>
       </a>
       <a href="#" class="nav-item" data-tab="incidents" id="nav-incidents">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -64,11 +69,6 @@
       <a href="#" class="nav-item" data-tab="shelters" id="nav-shelters">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         <span>Shelters</span>
-      </a>
-      <a href="#" class="nav-item" data-tab="india" id="nav-india">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-        <span>India Analysis</span>
-        <span class="nav-badge" style="background:rgba(255,153,51,0.25);color:#FF9933">NEW</span>
       </a>
       <a href="#" class="nav-item" data-tab="reports" id="nav-reports">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -195,20 +195,60 @@
         </div>
       </div>
 
+      <!-- World Risk Strip -->
+      <div class="world-risk-strip" id="worldRiskStrip">
+        <div class="wrs-item extreme"><span class="wrs-count" id="wrsExtreme">0</span><span class="wrs-label">Extreme</span></div>
+        <div class="wrs-item high"><span class="wrs-count" id="wrsHigh">0</span><span class="wrs-label">High Risk</span></div>
+        <div class="wrs-item moderate"><span class="wrs-count" id="wrsModerate">0</span><span class="wrs-label">Moderate</span></div>
+        <div class="wrs-item low"><span class="wrs-count" id="wrsLow">0</span><span class="wrs-label">Low Risk</span></div>
+        <div class="wrs-item total"><span class="wrs-count" id="wrsTotal">50</span><span class="wrs-label">Countries</span></div>
+      </div>
+
       <!-- Bottom Row -->
       <div class="bottom-row">
         <div class="card">
-          <div class="card-header">
-            <h3>Regional Risk Overview</h3>
+          <div class="card-header" style="flex-wrap:wrap;gap:10px">
+            <h3>🌍 Global Risk Overview</h3>
+            <div class="global-filter-bar">
+              <select id="filterContinent" class="small-select">
+                <option value="all">All Continents</option>
+                <option value="Asia">Asia</option>
+                <option value="M.East">Middle East</option>
+                <option value="Africa">Africa</option>
+                <option value="Europe">Europe</option>
+                <option value="Americas">Americas</option>
+                <option value="Oceania">Oceania</option>
+              </select>
+              <select id="filterRiskLevel" class="small-select">
+                <option value="all">All Risk Levels</option>
+                <option value="extreme">🔴 Extreme</option>
+                <option value="high">🟠 High</option>
+                <option value="moderate">🟡 Moderate</option>
+                <option value="low">🟢 Low</option>
+              </select>
+              <select id="filterCountrySearch" class="small-select">
+                <option value="all">All Countries</option>
+              </select>
+              <select id="sortWorldTable" class="small-select">
+                <option value="temp">Sort: Temperature</option>
+                <option value="deaths">Sort: Deaths</option>
+                <option value="hosp">Sort: Hospitalizations</option>
+                <option value="name">Sort: Country Name</option>
+              </select>
+            </div>
           </div>
           <div class="risk-table-wrap">
             <table class="risk-table" id="riskTable">
               <thead>
                 <tr>
-                  <th>Region</th>
-                  <th>Temp (°C)</th>
+                  <th>Country</th>
+                  <th>Continent</th>
+                  <th>Peak °C</th>
                   <th>Humidity</th>
                   <th>Population</th>
+                  <th>Deaths</th>
+                  <th>Hospitalised</th>
+                  <th>Alert</th>
                   <th>Risk Level</th>
                 </tr>
               </thead>
@@ -227,31 +267,60 @@
         </div>
       </div>
 
+      <!-- Global Top-20 Temperature Chart -->
+      <div class="card">
+        <div class="card-header">
+          <h3>🌡️ Top 20 Hottest Countries — Peak Temperature Ranking</h3>
+          <span class="card-badge" id="globalChartBadge">All Countries</span>
+        </div>
+        <div class="chart-wrap" style="height:300px">
+          <canvas id="globalTempChart"></canvas>
+        </div>
+      </div>
+
     </section>
 
     <!-- ─────────────────────────────────────
          TAB: RISK ZONE MAP
     ───────────────────────────────────── -->
     <section class="tab-section" id="tab-map">
+      <!-- Continent Filter Pills -->
+      <div class="continent-pills">
+        <span class="cp-label">🌍 Filter:</span>
+        <button class="continent-pill active" data-continent="all" id="cp-all">All Countries</button>
+        <button class="continent-pill" data-continent="Asia" id="cp-asia">🌏 Asia</button>
+        <button class="continent-pill" data-continent="M.East" id="cp-meast">🕌 Middle East</button>
+        <button class="continent-pill" data-continent="Africa" id="cp-africa">🌍 Africa</button>
+        <button class="continent-pill" data-continent="Europe" id="cp-europe">🌎 Europe</button>
+        <button class="continent-pill" data-continent="Americas" id="cp-americas">🌎 Americas</button>
+        <button class="continent-pill" data-continent="Oceania" id="cp-oceania">🌏 Oceania</button>
+      </div>
+
       <div class="map-controls">
         <div class="card compact">
-          <h4>Map Layers</h4>
+          <h4>🔍 Fly to Country</h4>
+          <select id="mapCountryFlyTo" class="map-fly-select">
+            <option value="">Select country…</option>
+          </select>
+          <h4 style="margin-top:12px">Map Layers</h4>
           <label class="toggle-label"><input type="checkbox" id="layerRisk" checked> Risk Zones</label>
           <label class="toggle-label"><input type="checkbox" id="layerShelters" checked> Shelters</label>
           <label class="toggle-label"><input type="checkbox" id="layerIncidents" checked> Incidents</label>
         </div>
         <div class="card compact">
           <h4>Risk Legend</h4>
-          <div class="legend-item"><span class="legend-box extreme"></span>Extreme (>46°C)</div>
+          <div class="legend-item"><span class="legend-box extreme"></span>Extreme (&gt;46°C)</div>
           <div class="legend-item"><span class="legend-box high"></span>High (42–46°C)</div>
           <div class="legend-item"><span class="legend-box moderate"></span>Moderate (38–42°C)</div>
-          <div class="legend-item"><span class="legend-box low"></span>Low (<38°C)</div>
+          <div class="legend-item"><span class="legend-box low"></span>Low (&lt;38°C)</div>
         </div>
         <div class="card compact" id="mapStatsCard">
-          <h4>Zone Statistics</h4>
-          <div class="map-stat"><span>Extreme Zones</span><strong class="danger-text">3</strong></div>
-          <div class="map-stat"><span>High Zones</span><strong class="warn-text">2</strong></div>
-          <div class="map-stat"><span>Moderate Zones</span><strong class="info-text">2</strong></div>
+          <h4>Global Statistics</h4>
+          <div class="map-stat"><span>🔴 Extreme</span><strong class="danger-text" id="mapExtCount">0</strong></div>
+          <div class="map-stat"><span>🟠 High Risk</span><strong class="warn-text" id="mapHighCount">0</strong></div>
+          <div class="map-stat"><span>🟡 Moderate</span><strong class="info-text" id="mapModCount">0</strong></div>
+          <div class="map-stat"><span>🟢 Low Risk</span><strong class="safe-text" id="mapLowCount">0</strong></div>
+          <div class="map-stat"><span>Total Deaths</span><strong class="danger-text" id="mapTotalDeaths">0</strong></div>
           <div class="map-stat"><span>Shelter Sites</span><strong class="safe-text" id="mapShelterCount">0</strong></div>
         </div>
       </div>
@@ -279,21 +348,21 @@
                 <option value="Power Outage">Power Outage</option>
                 <option value="Water Shortage">Water Shortage</option>
                 <option value="Mass Evacuation">Mass Evacuation</option>
+                <option value="Drought">Drought</option>
                 <option value="Other">Other</option>
               </select>
             </div>
-            <div class="form-group">
-              <label for="incRegion">Region / Location</label>
-              <select id="incRegion" required>
-                <option value="">Select region...</option>
-                <option value="Zone A – Ardena">Zone A – Ardena</option>
-                <option value="Zone B – Braxton">Zone B – Braxton</option>
-                <option value="Zone C – Cordell">Zone C – Cordell</option>
-                <option value="Zone D – Delvar">Zone D – Delvar</option>
-                <option value="Zone E – Elvira">Zone E – Elvira</option>
-                <option value="Zone F – Farentino">Zone F – Farentino</option>
-                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
-              </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="incCountry">Country</label>
+                <select id="incCountry" required>
+                  <option value="">Select country…</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="incRegion">City / Region</label>
+                <input type="text" id="incRegion" placeholder="e.g. Churu, Delhi…" required/>
+              </div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -328,25 +397,27 @@
 
         <!-- Incident List -->
         <div class="card">
-          <div class="card-header">
+          <div class="card-header" style="flex-wrap:wrap;gap:8px">
             <h3>Incident Log <span class="count-badge" id="incidentTotal">0</span></h3>
             <div class="filter-row">
               <select id="filterSeverity" class="small-select">
                 <option value="all">All Severity</option>
-                <option value="Critical">Critical</option>
-                <option value="High">High</option>
-                <option value="Moderate">Moderate</option>
-                <option value="Low">Low</option>
+                <option value="Critical">🔴 Critical</option>
+                <option value="High">🟠 High</option>
+                <option value="Moderate">🟡 Moderate</option>
+                <option value="Low">🟢 Low</option>
               </select>
-              <select id="filterRegion" class="small-select">
-                <option value="all">All Regions</option>
-                <option value="Zone A – Ardena">Zone A</option>
-                <option value="Zone B – Braxton">Zone B</option>
-                <option value="Zone C – Cordell">Zone C</option>
-                <option value="Zone D – Delvar">Zone D</option>
-                <option value="Zone E – Elvira">Zone E</option>
-                <option value="Zone F – Farentino">Zone F</option>
-                <option value="Zone G – Gorvia">Zone G</option>
+              <select id="filterContry" class="small-select">
+                <option value="all">All Countries</option>
+              </select>
+              <select id="filterContinent" class="small-select">
+                <option value="all">All Continents</option>
+                <option value="Asia">Asia</option>
+                <option value="M.East">Middle East</option>
+                <option value="Africa">Africa</option>
+                <option value="Europe">Europe</option>
+                <option value="Americas">Americas</option>
+                <option value="Oceania">Oceania</option>
               </select>
             </div>
           </div>
@@ -389,20 +460,19 @@
           <form id="shelterForm" class="app-form">
             <div class="form-group">
               <label for="shelName">Shelter Name</label>
-              <input type="text" id="shelName" placeholder="e.g., Central Community Hall" required/>
+              <input type="text" id="shelName" placeholder="e.g., Delhi Community Cooling Centre" required/>
             </div>
-            <div class="form-group">
-              <label for="shelRegion">Region</label>
-              <select id="shelRegion" required>
-                <option value="">Select region...</option>
-                <option value="Zone A – Ardena">Zone A – Ardena</option>
-                <option value="Zone B – Braxton">Zone B – Braxton</option>
-                <option value="Zone C – Cordell">Zone C – Cordell</option>
-                <option value="Zone D – Delvar">Zone D – Delvar</option>
-                <option value="Zone E – Elvira">Zone E – Elvira</option>
-                <option value="Zone F – Farentino">Zone F – Farentino</option>
-                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
-              </select>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="shelCountry">Country</label>
+                <select id="shelCountry" required>
+                  <option value="">Select country…</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="shelCity">City / District</label>
+                <input type="text" id="shelCity" placeholder="e.g. Churu, Baghdad…" required/>
+              </div>
             </div>
             <div class="form-row">
               <div class="form-group">
@@ -445,13 +515,16 @@
 
         <!-- Shelter Cards -->
         <div class="shelters-column">
-          <div class="card-header standalone">
+          <div class="card-header standalone" style="flex-wrap:wrap;gap:8px">
             <h3>Active Shelters <span class="count-badge" id="shelterTotal">0</span></h3>
-            <div class="overall-capacity">
-              <span id="overallCapText">0 / 0 total capacity</span>
-              <div class="capacity-bar-wrap">
-                <div class="capacity-bar-fill" id="overallCapBar" style="width: 0%"></div>
-              </div>
+            <select id="filterShelterCountry" class="small-select">
+              <option value="all">All Countries</option>
+            </select>
+          </div>
+          <div class="overall-capacity">
+            <span id="overallCapText">0 / 0 total capacity</span>
+            <div class="capacity-bar-wrap">
+              <div class="capacity-bar-fill" id="overallCapBar" style="width: 0%"></div>
             </div>
           </div>
           <div class="shelter-list" id="shelterList">
@@ -494,6 +567,11 @@
                   <span class="rt-label">Public Bulletin</span>
                   <span class="rt-sub">For public release</span>
                 </button>
+                <button class="report-type-btn" data-type="integration" id="rtIntegration">
+                  <span class="rt-icon">🔌</span>
+                  <span class="rt-label">Data Integration Plan</span>
+                  <span class="rt-sub">Weather & climate APIs</span>
+                </button>
               </div>
             </div>
             <div class="form-row">
@@ -507,16 +585,29 @@
               </div>
             </div>
             <div class="form-group">
-              <label for="rptRegion">Region Filter</label>
+              <label>Report Scope</label>
+              <div class="scope-selector" id="reportScopeSelector">
+                <button class="scope-btn active" data-scope="global" id="rsGlobal">🌍 Global</button>
+                <button class="scope-btn" data-scope="continent" id="rsContinent">🌐 Continent</button>
+                <button class="scope-btn" data-scope="country" id="rsCountry">🏳️ Country</button>
+              </div>
+            </div>
+            <div class="form-group" id="rptContinentGroup" style="display:none">
+              <label for="rptContinent">Select Continent</label>
+              <select id="rptContinent">
+                <option value="all">All Continents</option>
+                <option value="Asia">Asia</option>
+                <option value="M.East">Middle East</option>
+                <option value="Africa">Africa</option>
+                <option value="Europe">Europe</option>
+                <option value="Americas">Americas</option>
+                <option value="Oceania">Oceania</option>
+              </select>
+            </div>
+            <div class="form-group" id="rptCountryGroup" style="display:none">
+              <label for="rptRegion">Select Country</label>
               <select id="rptRegion">
-                <option value="all">All Regions</option>
-                <option value="Zone A – Ardena">Zone A – Ardena</option>
-                <option value="Zone B – Braxton">Zone B – Braxton</option>
-                <option value="Zone C – Cordell">Zone C – Cordell</option>
-                <option value="Zone D – Delvar">Zone D – Delvar</option>
-                <option value="Zone E – Elvira">Zone E – Elvira</option>
-                <option value="Zone F – Farentino">Zone F – Farentino</option>
-                <option value="Zone G – Gorvia">Zone G – Gorvia</option>
+                <option value="all">All Countries</option>
               </select>
             </div>
             <div class="form-group">
